@@ -1,10 +1,12 @@
 import time
 import sys
 import math
-from PIL import Image as img
+import cv2  # pip install opencv-python
+from PIL import Image as img  # pip install Pillow
 import numpy as np
 import sympy as sp
 import matplotlib.pyplot as plt
+from scipy.stats import entropy
 
 # =============================================================================
 # Constants
@@ -60,11 +62,7 @@ def showHistogram():
     file = open(output_path, "r")
     data = np.loadtxt(file)
     histogram = plt.hist(data, histtype='bar', bins=m, range=[0, m])
-    ent = 0
-    for i in histogram[0]:
-        if(i != 0):
-            ent += (-(i/random_numbers_amount) *
-                    math.log2(i/random_numbers_amount))
+    ent = entropy(histogram[0], base=2)
     print("Entropia:", round(ent, 4))
     plt.xlabel('Generated number')
     plt.ylabel('Number of occurrences')
@@ -79,11 +77,13 @@ def showHistogram():
 
 def worker():
     start = time.time()
+
     lena_image = img.open(image_path)       # load image
     global width, height
     width, height = lena_image.size  # get width and height
     global pixs_val
     pixs_val = np.array(lena_image)         # cast image to array
+
     seed = getSeed(image_path)
     random_number = getRandomNumber(seed[0], seed[1], seed[2])
     print("Worker has been launched..")
