@@ -7,6 +7,7 @@ import numpy as np
 import sympy as sp
 import matplotlib.pyplot as plt
 from scipy.stats import entropy
+from sympy.core.evalf import do_integral
 
 # =============================================================================
 # Constants
@@ -15,42 +16,42 @@ from scipy.stats import entropy
 
 image_path = "./lena.png"
 output_path = "./output.txt"
+video_path = "./test.mp4"
 m = 197
-random_numbers_amount = 100000
+random_numbers_amount = 1000000
 
 
 # =============================================================================
 # Random number generate methods
 # =============================================================================
 
-
-def getRandomPixelValue():
-    current_width, current_height = int(
-        time.time() * 1000 % width), int(time.time() * 1000 % height)
-    return pixs_val[current_width, current_height][0]
-
-
 def getSeed(path):
-    value = getRandomPixelValue()
-    if(value <= 2):                         # p1
-        prev_prime = value                  #
-    else:                                   #
-        prev_prime = sp.prevprime(value)
+    value = getRandomPixelValue()           # get random pixel's value
+    while(value <= 2):
+        value += 3
+    prev_prime = sp.prevprime(value)        # p1
     next_prime = sp.nextprime(value)        # p2
 
     return [((prev_prime*next_prime) % m), prev_prime, next_prime]
 
 
+def getRandomPixelValue():
+    current_time = time.time() * 1000               # get system_clock
+    current_width = int(current_time % frameWidth)
+    current_height = int(current_time % frameHeight)
+
+    return frames[((current_width * current_height) % frameCount), current_height, current_width, ((current_width * current_height) % 3)]
+
+
 def getRandomNumber(prev_x, prev_p1, prev_p2):
-    f = getRandomPixelValue()
-    if(f <= 2):
-        current_p1 = f
-    else:
-        current_p1 = sp.prevprime(f)
-    current_p2 = sp.nextprime(f)
-    a = current_p1*current_p2             # incr
-    b = (f * prev_p1 * prev_p2) % m       # multi
-    x = ((prev_x*b+a) % m)                # next
+    f = getRandomPixelValue()               # get random pixel's value
+    while(f <= 2):
+        f += 3
+    current_p1 = sp.prevprime(f)            # previous prime number
+    current_p2 = sp.nextprime(f)            # next prime number
+    a = current_p1 * current_p2             # incr
+    b = ((f * prev_p1 * prev_p2) % m)       # multi
+    x = ((prev_x*b+a) % m)                  # next
     return [x, current_p1, current_p2]
 
 # =============================================================================
@@ -75,32 +76,41 @@ def showHistogram():
 # =============================================================================
 
 
-def worker():
-    start = time.time()
-
-    lena_image = img.open(image_path)       # load image
-    global width, height
-    width, height = lena_image.size  # get width and height
-    global pixs_val
-    pixs_val = np.array(lena_image)         # cast image to array
-
-    cap = cv2.VideoCapture('test.mp4')
+def loadVideo(path):
+    cap = cv2.VideoCapture(path)
+    global frameCount, frameWidth, frameHeight
     frameCount = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     frameWidth = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     frameHeight = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    buf = np.empty((frameCount, frameHeight, frameWidth, 3), np.dtype('uint8'))
+    captured_frames = np.empty(
+        (frameCount, frameHeight, frameWidth, 3), np.dtype('uint8'))
     fc = 0
     ret = True
-
     while (fc < frameCount and ret):
-        ret, buf[fc] = cap.read()
+        ret, captured_frames[fc] = cap.read()
         fc += 1
     cap.release()
 
+    return captured_frames
+
+
+def worker():
+    start = time.time()
+
+    # lena_image = img.open(image_path)       #load image
+    # global width, height
+    # width, height = lena_image.size  # get width and height
+    # global pixs_val
+    # pixs_val = np.array(lena_image)         # cast image to array
+
+    global iterIndex
+    iterIndex = 0
+    global frames
+    frames = loadVideo(video_path)
     seed = getSeed(image_path)
     random_number = getRandomNumber(seed[0], seed[1], seed[2])
     print("Worker has been launched..")
-    iterIndex = 0
+
     with open(output_path, "a") as text_file:
         while iterIndex <= random_numbers_amount:
             temp = getRandomNumber(
@@ -113,6 +123,7 @@ def worker():
                 if(((iterIndex % int(random_numbers_amount/10)) == 0) and (iterIndex != 0)):
                     print(iterIndex, "numbers has been generated.")
                 iterIndex += 1
+
     text_file.close()
     print(random_numbers_amount, "numbers in", round(
         (time.time() - start), 2), "seconds.")
@@ -130,7 +141,7 @@ def main():
                 os.remove('output.txt')
                 print('Output file has been removed!')
             except Exception as e:
-                print(f'File does not exist, creating new one..')
+                print(f'Creating new one..')
             finally:
                 file = open("output.txt", "w")
         if(sys.argv[1] == "--hist"):
