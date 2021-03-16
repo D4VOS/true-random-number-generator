@@ -36,9 +36,7 @@ def getSeed(path):
         prev_prime = sp.prevprime(value)
     next_prime = sp.nextprime(value)        # p2
 
-
-0
-return [((prev_prime*next_prime) % m), prev_prime, next_prime]
+    return [((prev_prime*next_prime) % m), prev_prime, next_prime]
 
 
 def getRandomNumber(prev_x, prev_p1, prev_p2):
