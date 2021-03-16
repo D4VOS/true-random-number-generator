@@ -41,6 +41,7 @@ def getRandomPixelValue():
     current_height = int(current_time % frameHeight)
 
     return frames[((current_width * current_height) % frameCount), current_height, current_width, ((current_width * current_height) % 3)]
+    # [frame_no, height, width, [R,G,B]]
 
 
 def getRandomNumber(prev_x, prev_p1, prev_p2):
