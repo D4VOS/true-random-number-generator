@@ -1,5 +1,5 @@
 # True Random Number Generator
-## Based on Non-Recurring Improved Random Number Generator- a new step to improve cryptographic algorithms
+## Based on Non-Recurring Improved Random Number Generator - a new step to improve cryptographic algorithms
 Implementation of DOI: [10.4108/eai.12-6-2018.154813][DOI] article in Python 3.8, uses PIL, time, numpy and math libs. 
 
 
