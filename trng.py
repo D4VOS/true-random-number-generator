@@ -36,7 +36,9 @@ def getSeed(path):
         prev_prime = sp.prevprime(value)
     next_prime = sp.nextprime(value)        # p2
 
-    return [((prev_prime*next_prime) % m), prev_prime, next_prime]
+
+0
+return [((prev_prime*next_prime) % m), prev_prime, next_prime]
 
 
 def getRandomNumber(prev_x, prev_p1, prev_p2):
@@ -78,6 +80,7 @@ def showHistogram():
 
 
 def worker():
+    start = time.time()
     lena_image = img.open(image_path)       # load image
     global width, height
     width, height = lena_image.size  # get width and height
@@ -96,10 +99,12 @@ def worker():
             else:
                 random_number = temp
                 print("{}".format(random_number[0]), file=text_file)
-                if(((iterIndex % 1000) == 0) and (iterIndex != 0)):
+                if(((iterIndex % int(random_numbers_amount/10)) == 0) and (iterIndex != 0)):
                     print(iterIndex, "numbers has been generated.")
                 iterIndex += 1
     text_file.close()
+    print(random_numbers_amount, "numbers in", round(
+        (time.time() - start), 2), "seconds.")
     showHistogram()
 
 # =============================================================================
