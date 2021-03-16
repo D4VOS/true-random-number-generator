@@ -84,6 +84,19 @@ def worker():
     global pixs_val
     pixs_val = np.array(lena_image)         # cast image to array
 
+    cap = cv2.VideoCapture('test.mp4')
+    frameCount = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    frameWidth = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    frameHeight = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    buf = np.empty((frameCount, frameHeight, frameWidth, 3), np.dtype('uint8'))
+    fc = 0
+    ret = True
+
+    while (fc < frameCount and ret):
+        ret, buf[fc] = cap.read()
+        fc += 1
+    cap.release()
+
     seed = getSeed(image_path)
     random_number = getRandomNumber(seed[0], seed[1], seed[2])
     print("Worker has been launched..")
