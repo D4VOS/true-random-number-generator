@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 image_path = "./lena.png"
 output_path = "./output.txt"
 m = 197
-random_numbers_amount = 10000
+random_numbers_amount = 100000
 
 
 # =============================================================================
@@ -22,17 +22,14 @@ random_numbers_amount = 10000
 # =============================================================================
 
 
-def getRandomPixelValue(image_path):
-    lena_image = img.open(image_path)       # load image
-    width, height = lena_image.size         # get width and height
-    pixs_val = np.array(lena_image)         # cast image to array
+def getRandomPixelValue():
     current_width, current_height = int(
         time.time() * 1000 % width), int(time.time() * 1000 % height)
     return pixs_val[current_width, current_height][0]
 
 
 def getSeed(path):
-    value = getRandomPixelValue(path)
+    value = getRandomPixelValue()
     if(value <= 2):                         # p1
         prev_prime = value                  #
     else:                                   #
@@ -43,7 +40,7 @@ def getSeed(path):
 
 
 def getRandomNumber(prev_x, prev_p1, prev_p2):
-    f = getRandomPixelValue(image_path)
+    f = getRandomPixelValue()
     if(f <= 2):
         current_p1 = f
     else:
@@ -81,6 +78,11 @@ def showHistogram():
 
 
 def worker():
+    lena_image = img.open(image_path)       # load image
+    global width, height
+    width, height = lena_image.size  # get width and height
+    global pixs_val
+    pixs_val = np.array(lena_image)         # cast image to array
     seed = getSeed(image_path)
     random_number = getRandomNumber(seed[0], seed[1], seed[2])
     print("Worker has been launched..")
