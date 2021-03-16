@@ -26,9 +26,8 @@ random_numbers_amount = 1000000
 # =============================================================================
 
 def getSeed(path):
-    value = getRandomPixelValue()           # get random pixel's value
-    while(value <= 2):
-        value += 3
+    value = getRandomPixelValue() + 3       # get random pixel's value
+
     prev_prime = sp.prevprime(value)        # p1
     next_prime = sp.nextprime(value)        # p2
 
@@ -45,9 +44,7 @@ def getRandomPixelValue():
 
 
 def getRandomNumber(prev_x, prev_p1, prev_p2):
-    f = getRandomPixelValue()               # get random pixel's value
-    while(f <= 2):
-        f += 3
+    f = getRandomPixelValue() + 3           # get random pixel's value
     current_p1 = sp.prevprime(f)            # previous prime number
     current_p2 = sp.nextprime(f)            # next prime number
     a = current_p1 * current_p2             # incr
@@ -65,7 +62,7 @@ def showHistogram():
     data = np.loadtxt(file)
     histogram = plt.hist(data, histtype='bar', bins=m, range=[0, m])
     ent = entropy(histogram[0], base=2)
-    print("Entropia:", round(ent, 4))
+    print("Entropia:", round(ent, 5))
     plt.xlabel('Generated number')
     plt.ylabel('Number of occurrences')
     plt.title('Distribution of generated numbers')
