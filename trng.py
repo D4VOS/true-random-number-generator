@@ -10,139 +10,132 @@ from scipy.stats import entropy
 from sympy.core.evalf import do_integral
 
 # =============================================================================
-# Constants
+# * Constants
 # =============================================================================
-
 
 image_path = "./lena.png"
 output_path = "./output.txt"
 video_path = "./test.mp4"
-m = 197
+m = 251
 random_numbers_amount = 1000000
 
-
 # =============================================================================
-# Random number generate methods
+# * Random number generate methods
 # =============================================================================
 
-def getSeed(path):
-    value = getRandomPixelValue() + 3       # get random pixel's value
 
-    prev_prime = sp.prevprime(value)        # p1
-    next_prime = sp.nextprime(value)        # p2
+def getSeed(path, source, framesCount, frameWidth, frameHeight):
+    value = getRandomPixelValue(source, framesCount, frameWidth, frameHeight) + 3  # get random pixel's value
 
-    return [((prev_prime*next_prime) % m), prev_prime, next_prime]
+    prev_prime = sp.prevprime(value)  # p1
+    next_prime = sp.nextprime(value)  # p2
+
+    return ((prev_prime * next_prime) % m), prev_prime, next_prime
 
 
-def getRandomPixelValue():
-    current_time = time.time() * 1000               # get system_clock
+def getRandomPixelValue(source, framesCount, frameWidth, frameHeight):
+    current_time = time.time() * 1000  # get system_clock
     current_width = int(current_time % frameWidth)
     current_height = int(current_time % frameHeight)
 
-    return frames[((current_width * current_height) % frameCount), current_height, current_width, ((current_width * current_height) % 3)]
+    return source[((current_width * current_height) % framesCount), current_height, current_width, ((current_width * current_height) % 3)]
     # [frame_no, height, width, [R,G,B]]
 
 
-def getRandomNumber(prev_x, prev_p1, prev_p2):
-    f = getRandomPixelValue() + 3           # get random pixel's value
-    current_p1 = sp.prevprime(f)            # previous prime number
-    current_p2 = sp.nextprime(f)            # next prime number
-    a = current_p1 * current_p2             # incr
-    b = ((f * prev_p1 * prev_p2) % m)       # multi
-    x = ((prev_x*b+a) % m)                  # next
-    return [x, current_p1, current_p2]
+def getRandomNumber(prev_x, prev_p1, prev_p2, source, framesCount, frameWidth, frameHeight):
+    f = getRandomPixelValue(source, framesCount, frameWidth, frameHeight) + 3  # get random pixel's value
+    current_p1 = sp.prevprime(f)  # previous prime number
+    current_p2 = sp.nextprime(f)  # next prime number
+    a = (current_p1 * current_p2)  # incr
+    b = ((f * prev_p1 * prev_p2) % m)  # ! multi ? % m
+    x = (prev_x * b + a) % m  # next
+    return x, current_p1, current_p2
+
 
 # =============================================================================
-# Display methods
+# * Display methods
 # =============================================================================
 
 
 def showHistogram():
     file = open(output_path, "r")
     data = np.loadtxt(file)
-    histogram = plt.hist(data, histtype='bar', bins=m, range=[0, m])
+    histogram = plt.hist(data, histtype="bar", bins=m, range=[0, m])
     ent = entropy(histogram[0], base=2)
+
     print("Entropia:", round(ent, 5))
-    plt.xlabel('Generated number')
-    plt.ylabel('Number of occurrences')
-    plt.title('Distribution of generated numbers')
+    plt.xlabel("Generated number")
+    plt.ylabel("Number of occurrences")
+    plt.title("Distribution of generated numbers")
     plt.show()
     file.close()
 
+
 # =============================================================================
-# Worker method
+# * Worker method
 # =============================================================================
 
 
 def loadVideo(path):
     cap = cv2.VideoCapture(path)
-    global frameCount, frameWidth, frameHeight
-    frameCount = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    framesCount = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     frameWidth = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     frameHeight = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    captured_frames = np.empty(
-        (frameCount, frameHeight, frameWidth, 3), np.dtype('uint8'))
+    captured_frames = np.empty((framesCount, frameHeight, frameWidth, 3), np.dtype("uint8"))
     fc = 0
     ret = True
-    while (fc < frameCount and ret):
+    while fc < framesCount and ret:
         ret, captured_frames[fc] = cap.read()
         fc += 1
     cap.release()
 
-    return captured_frames
+    return captured_frames, framesCount, frameWidth, frameHeight
 
 
 def worker():
-    start = time.time()
+    start = time.time()  # start time measure
 
-    # lena_image = img.open(image_path)       #load image
-    # global width, height
-    # width, height = lena_image.size  # get width and height
-    # global pixs_val
-    # pixs_val = np.array(lena_image)         # cast image to array
+    frames, framesCount, frameWidth, frameHeight = loadVideo(video_path)
+    seed, current_p1, current_p2 = getSeed(image_path, frames, framesCount, frameWidth, frameHeight)
+    random_number, current_p1, current_p2 = getRandomNumber(seed, current_p1, current_p2, frames, framesCount, frameWidth, frameHeight)
 
-    global iterIndex
-    iterIndex = 0
-    global frames
-    frames = loadVideo(video_path)
-    seed = getSeed(image_path)
-    random_number = getRandomNumber(seed[0], seed[1], seed[2])
     print("Worker has been launched..")
 
+    iterIndex = 0
     with open(output_path, "a") as text_file:
         while iterIndex <= random_numbers_amount:
-            temp = getRandomNumber(
-                random_number[0], random_number[1], random_number[2])
-            if(temp[0] == random_number[0]):
+            temp_number, temp_p1, temp_p2 = getRandomNumber(random_number, current_p1, current_p2, frames, framesCount, frameWidth, frameHeight)
+            if temp_number == random_number:
                 continue
             else:
-                random_number = temp
-                print("{}".format(random_number[0]), file=text_file)
-                if(((iterIndex % int(random_numbers_amount/10)) == 0) and (iterIndex != 0)):
-                    print(iterIndex, "numbers has been generated.")
+                random_number, current_p1, current_p2 = temp_number, temp_p1, temp_p2
+                print("{}".format(random_number), file=text_file)
+                if ((iterIndex % int(random_numbers_amount / 10)) == 0) and (iterIndex != 0):
+                    print(iterIndex, "numbers has been generated..")
                 iterIndex += 1
 
     text_file.close()
-    print(random_numbers_amount, "numbers in", round(
-        (time.time() - start), 2), "seconds.")
+
+    print("Done.", random_numbers_amount, "numbers have been generated in", round((time.time() - start), 2), "seconds.")  # finish time measure
     showHistogram()
 
+
 # =============================================================================
-# Main --new - reset current output.txt file, --hist - only generate histogram
+# * Main --new - reset current output.txt file, --hist - only generate histogram
 # =============================================================================
 
 
 def main():
-    if(len(sys.argv) > 1):
-        if(sys.argv[1] == "--new"):
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "--new":
             try:
-                os.remove('output.txt')
-                print('Output file has been removed!')
+                os.remove("output.txt")
+                print("Output file has been removed!")
             except Exception as e:
-                print(f'Creating new one..')
+                print(f"Creating new one..")
             finally:
                 file = open("output.txt", "w")
-        if(sys.argv[1] == "--hist"):
+        if sys.argv[1] == "--hist":
             showHistogram()
             return
     worker()
