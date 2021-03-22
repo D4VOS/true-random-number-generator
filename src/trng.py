@@ -13,9 +13,9 @@ from sympy.core.evalf import do_integral
 # * Constants
 # =============================================================================
 
-image_path = "./lena.png"
-output_path = "./output.txt"
-video_path = "./test.mp4"
+image_path = "resources/lena.png"
+output_path = "output.txt"
+video_path = "resources/test.mp4"
 m = 251
 random_numbers_amount = 1000000
 
@@ -24,7 +24,7 @@ random_numbers_amount = 1000000
 # =============================================================================
 
 
-def getSeed(path, source, framesCount, frameWidth, frameHeight):
+def getSeed(source, framesCount, frameWidth, frameHeight):
     value = getRandomPixelValue(source, framesCount, frameWidth, frameHeight) + 3  # get random pixel's value
 
     prev_prime = sp.prevprime(value)  # p1
@@ -72,7 +72,7 @@ def showHistogram():
 
 
 # =============================================================================
-# * Worker method
+# * Video handling method
 # =============================================================================
 
 
@@ -96,7 +96,7 @@ def worker():
     start = time.time()  # start time measure
 
     frames, framesCount, frameWidth, frameHeight = loadVideo(video_path)
-    seed, current_p1, current_p2 = getSeed(image_path, frames, framesCount, frameWidth, frameHeight)
+    seed, current_p1, current_p2 = getSeed(frames, framesCount, frameWidth, frameHeight)
     random_number, current_p1, current_p2 = getRandomNumber(seed, current_p1, current_p2, frames, framesCount, frameWidth, frameHeight)
 
     print("Worker has been launched..")
@@ -123,7 +123,6 @@ def worker():
 # =============================================================================
 # * Main --new - reset current output.txt file, --hist - only generate histogram
 # =============================================================================
-
 
 def main():
     if len(sys.argv) > 1:
