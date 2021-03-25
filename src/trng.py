@@ -73,12 +73,17 @@ def showHistogram(txt_path):
     fig, ax = plt.subplots()
     if(txt_path == SEED_OUTPUT):
         top = 255
+        if(m < 1000):
+            ymax = 4500
+        else:
+            ymax = 65
     else:
         top = m
-    if(m < 1000):
-        ymax = 4500
-    else:
-        ymax = 65
+        if(m < 1000):
+            ymax = 4500
+        else:
+            ymax = 65
+
     props = dict(boxstyle='round', facecolor='wheat', alpha=0.7)
     histogram = ax.hist(data, histtype='bar', bins=top, range=[0, top])
     ent = entropy(histogram[0], base=2)
