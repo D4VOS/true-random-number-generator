@@ -1,11 +1,11 @@
 import time
 import sys
+import os
 from types import ClassMethodDescriptorType
 import cv2  # pip install opencv-python
 import numpy as np
 import sympy as sp
 import matplotlib.pyplot as plt
-from scipy.stats import entropy
 
 # =============================================================================
 # * Constants
@@ -16,9 +16,9 @@ RESULT_OUTPUT = "output.txt"
 VIDEO_PATH = "resources/test2.mp4"
 NUMBERS_COUNT = 1000000
 
-m = 257         # 8 bits
+# m = 257         # 8 bits
 # m = 4294967295  # 32 bits :Sadge:
-m = 65535       # 16 bits
+m = 65537       # 16 bits
 
 # =============================================================================
 # * Random number generate methods
@@ -41,6 +41,7 @@ def getRandomPixelValue(video):
     rand_x = int(current_time % video["width"])
     rand_y = int(current_time % video["height"])
 
+    # return video["frames"][((rand_x * rand_y) % video["count"]), rand_y, rand_x, ((rand_x * rand_y) % 3)]  # [frame_no, height, width, [R,G,B]]
     return video["frames"][((rand_x * rand_y) % video["count"]), rand_y, rand_x, ((rand_x * rand_y) % 3)]  # [frame_no, height, width, [R,G,B]]
 
 
@@ -53,7 +54,7 @@ def getRandomNumber(generated_number, video):
         "seed_value": f
     }
 
-    a = (result["previous_prime"] * result["next_prime"])               # incr
+    a = (result["previous_prime"] * result["next_prime"])                                   # incr
     b = ((f * generated_number["previous_prime"] * generated_number["next_prime"]) % m)     # multi
     x = (generated_number["random_number"] * b + a) % m                                     # next
 
@@ -66,6 +67,27 @@ def getRandomNumber(generated_number, video):
 # * Display methods
 # =============================================================================
 
+# function to convert to subscript
+# from https://www.geeksforgeeks.org/how-to-print-superscript-and-subscript-in-python/
+def get_sub(x):
+    normal = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-=()"
+    sub_s = "ₐ₈CDₑբGₕᵢⱼₖₗₘₙₒₚQᵣₛₜᵤᵥwₓᵧZₐ♭꜀ᑯₑբ₉ₕᵢⱼₖₗₘₙₒₚ૧ᵣₛₜᵤᵥwₓᵧ₂₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎"
+    res = x.maketrans(''.join(normal), ''.join(sub_s))
+    return x.translate(res)
+
+
+def xstr(s):  # 'None' as string
+    if s is None:
+        return ''
+    return str(s)
+
+
+def entropy(labels, base=None):
+    value, counts = np.unique(labels, return_counts=True)
+    norm_counts = counts / counts.sum()
+    base = e if base is None else base
+    return -(norm_counts * np.log(norm_counts)/np.log(base)).sum()
+
 
 def showHistogram(txt_path):
     file = open(txt_path, "r")
@@ -73,33 +95,29 @@ def showHistogram(txt_path):
     fig, ax = plt.subplots()
     if(txt_path == SEED_OUTPUT):
         top = 255
-        if(m < 1000):
-            ymax = 4500
-        else:
-            ymax = 65
+        tekst = "generowanych przez plik wideo"
+        bins = 255
     else:
-        top = m
-        if(m < 1000):
-            ymax = 4500
+        top = m - 1
+        tekst = "po post-processingu"
+        if(m > 257):
+            bins = m // 100
         else:
-            ymax = 65
-
+            bins = m - 1
     props = dict(boxstyle='round', facecolor='wheat', alpha=0.7)
-    histogram = ax.hist(data, histtype='bar', bins=top, range=[0, top])
-    ent = entropy(histogram[0], base=2)
-    #ax.set_ylim(0, auto=True)
-    #ax.set_ylim(0, y.max()*1.1)
-    ax.set_xlabel("Generated number")
-    ax.set_ylabel("Number of occurrences")
-    ax.set_title("Distribution of {:,} generated numbers".format(NUMBERS_COUNT))
+    histogram = ax.hist(data, histtype='bar', density=True, stacked=True, bins=bins, range=[0, top])
+    ent = entropy(data, base=2)
+    ax.set_ylim([0, max(histogram[0])])
+    ax.set_xlabel("Wartość (x{})".format(get_sub('i')))
+    ax.set_ylabel("Częstotliwość występowania (p{})".format(get_sub('i')))
+    ax.set_title("Empiryczny rozkład zmiennych losowych {}\n".format(tekst))
     ax.text(0.12, 0.08, "H(X)={0}\nm={1}".format(round(ent, 5), m), transform=ax.transAxes, fontsize=10, verticalalignment='bottom', bbox=props)
-
-    plt.autoscale(enable=True, axis='y')
+    ax.ticklabel_format(useOffset=False, style='sci')
+    plt.gca().set_ylim(0, histogram[0].max()*1.05)
+    plt.gca().set_xlim(0, top - 1)
     plt.show()
-    if(txt_path == SEED_OUTPUT):
-        fig.savefig('charts/src_m_{}.png'.format(m), dpi=fig.dpi)
-    else:
-        fig.savefig('charts/m_{}.png'.format(m), dpi=fig.dpi)
+    base = os.path.splitext(os.path.basename(txt_path))
+    fig.savefig('charts/{0}_m_{1}.png'.format(base[0], m), dpi=fig.dpi)
     file.close()
 
 
@@ -150,7 +168,7 @@ def worker():
         "source": open(SEED_OUTPUT, "a")
     }
 
-    while (index <= NUMBERS_COUNT):
+    while (index < NUMBERS_COUNT):
         temp_generated_number = getRandomNumber(generated_number, video)
         if (temp_generated_number["random_number"] == generated_number["random_number"] or temp_generated_number["random_number"] == -1):
             continue
