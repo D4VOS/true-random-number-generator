@@ -13,12 +13,13 @@ import matplotlib.pyplot as plt
 
 SEED_OUTPUT = "seed_output.txt"
 RESULT_OUTPUT = "output.txt"
+BINARY_OUTPUT = "binaryout.bin"
 VIDEO_PATH = "resources/test2.mp4"
-NUMBERS_COUNT = 1000000
+NUMBERS_COUNT = 100000
 
-# m = 257         # 8 bits
+m = 257         # 8 bits
 # m = 4294967295  # 32 bits :Sadge:
-m = 65537       # 16 bits
+#m = 65537       # 16 bits
 
 # =============================================================================
 # * Random number generate methods
@@ -124,7 +125,9 @@ def showHistogram(txt_path):
 def save_result(number, files):
     print(number["random_number"], file=files["result"])
     print(number["seed_value"], file=files["source"])
-
+    byte_arr = [int(number["random_number"])]
+    binary_format = bytearray(byte_arr)
+    files["binary"].write(binary_format)
 # =============================================================================
 # * Video handling method
 # =============================================================================
@@ -165,7 +168,8 @@ def worker():
 
     files = {
         "result": open(RESULT_OUTPUT, "a"),
-        "source": open(SEED_OUTPUT, "a")
+        "source": open(SEED_OUTPUT, "a"),
+        "binary": open(BINARY_OUTPUT, "a+b")
     }
 
     while (index < NUMBERS_COUNT):
@@ -199,12 +203,14 @@ def main():
             try:
                 os.remove(SEED_OUTPUT)
                 os.remove(RESULT_OUTPUT)
+                os.remove(BINARY_OUTPUT)
                 print("Outputs files have been removed!")
             except Exception as e:
                 print(f"Creating new ones..")
             finally:
                 file = open(RESULT_OUTPUT, "w")
                 file = open(SEED_OUTPUT, "w")
+                file = open(BINARY_OUTPUT, "a+b")
         if sys.argv[1] == "--hist":
             showHistogram(RESULT_OUTPUT)
             showHistogram(SEED_OUTPUT)
