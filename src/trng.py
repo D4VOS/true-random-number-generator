@@ -15,11 +15,11 @@ SEED_OUTPUT = "seed_output.txt"
 RESULT_OUTPUT = "output.txt"
 BINARY_OUTPUT = "binaryout.bin"
 VIDEO_PATH = "resources/test2.mp4"
-NUMBERS_COUNT = 100000
+NUMBERS_COUNT = 4800000
 
 m = 257         # 8 bits
 # m = 4294967295  # 32 bits :Sadge:
-#m = 65537       # 16 bits
+# m = 65537       # 16 bits
 
 # =============================================================================
 # * Random number generate methods
