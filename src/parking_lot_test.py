@@ -2,11 +2,19 @@ import math
 import scipy.stats as sc
 
 BINARY_OUTPUT = "binaryout.bin"
+FAKE = "fake.bin"
 
 NO_TRIALS = 12000
 NO_TESTS = 10
 UNIMAX = 4294967296.  # unsigned max value of 32-bit
 RATIO = 100 / UNIMAX
+
+def fakebin():
+    with open(FAKE, 'wb') as file:
+        for i in range(9600000):
+            byte_arr = [i % 255]
+            binary_format = bytearray(byte_arr)
+            file.write(binary_format)
 
 
 def park():
@@ -88,4 +96,5 @@ def eof(x, y):
     return x == '' or y == ''
 
 
-park()
+#park()
+fakebin()

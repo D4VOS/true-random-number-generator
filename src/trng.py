@@ -124,8 +124,8 @@ def showHistogram(txt_path):
 
 
 def save_result(number, files):
-    print(number["random_number"], file=files["result"])
-    print(number["seed_value"], file=files["source"])
+    #print(number["random_number"], file=files["result"])
+    #print(number["seed_value"], file=files["source"])
     byte_arr = [number["random_number"]]
     binary_format = bytearray(byte_arr)
     files["binary"].write(binary_format)
