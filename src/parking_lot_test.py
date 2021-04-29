@@ -70,7 +70,7 @@ def park():
     #             p-value of KSTEST for those 100: KstestResult(statistic=0.5, pvalue=1.2131434371817858e-23)
     #=========================================================================================================#
 
-def phi(n):
+def phi(n): # todo
     amount = 0
     for k in range(1, int(n) + 1):
         if gcd(n, k) == 1:
