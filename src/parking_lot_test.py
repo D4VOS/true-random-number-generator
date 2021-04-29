@@ -11,8 +11,8 @@ RATIO = 100 / UNIMAX
 
 def park():
     with open(BINARY_OUTPUT, 'rb') as file:
-        SUM, SS = 0, 0
-        P = [0.] * 100
+        sum, ss = 0, 0
+        p = [0.] * 100
         for test in range(1, NO_TESTS + 1):  # 100 testow
 
             x = [0.] * NO_TRIALS
@@ -22,40 +22,40 @@ def park():
             second = float(int.from_bytes(file.read(4), byteorder='big', signed=False) * RATIO)
             x[0] = first
             y[0] = second
-            NO_SUCCESS = 1
+            no_success = 1
 
             for attempt in range(0, NO_TRIALS):
                 first = float(int.from_bytes(file.read(4), byteorder='big', signed=False) * RATIO)
                 second = float(int.from_bytes(file.read(4), byteorder='big', signed=False) * RATIO)
                 crashed = False
-                for i in range(NO_SUCCESS):
+                for i in range(no_success):
                     if math.fabs(x[i - 1] - first) <= 1.0 and math.fabs(y[i - 1] - second) <= 1.0:
                         crashed = True
                         break
                 if not crashed:
                     x[attempt] = first
                     y[attempt] = second
-                    NO_SUCCESS += 1
+                    no_success += 1
 
-            SUM += NO_SUCCESS
-            SS += NO_SUCCESS * NO_SUCCESS
+            sum += no_success
+            ss += no_success * no_success
 
-            Z = (NO_SUCCESS - 3523.0) / 21.9
-            P[test - 1] = 1 - phi(Z)
+            z = (no_success - 3523.0) / 21.9
+            p[test - 1] = 1 - phi(z)
 
-            print(f"No.{test}\t\t{NO_SUCCESS}\t{Z}\t\t{P[test - 1]}")
+            print(f"No.{test}\t\t{no_success}\t{z}\t\t{p[test - 1]}")
 
-    mean = SUM / NO_TESTS
-    var = SS / NO_SUCCESS - mean * mean
+    mean = sum / NO_TESTS
+    var = ss / no_success - mean * mean
     print(f"Square side=100, avg no. parked={mean} "
           f"sample std={var ** 0.5}")
 
-    pvalue = sc.kstest(P, 'norm')
+    pvalue = sc.kstest(p, 'norm')
     print(f"\t p-value of KSTEST for those {NO_TESTS} tests: {pvalue}")
     #=========================================================================================================#
     # Output for first 10 tests, idk what's wrong
     #---------------------------------------------------------------------------------------------------------#
-    #    Test No.  NO_SUCCESS    Z                     P[Test No.]
+    #    Test No.  no_success    z                     P[Test No.]
     #    No.1            4817    59.08675799086758               1
     #    No.2            4938    64.61187214611873               1
     #    No.3            4845    60.365296803652974              1
