@@ -6,6 +6,7 @@ import cv2  # pip install opencv-python
 import numpy as np
 import sympy as sp
 import matplotlib.pyplot as plt
+import pickle
 
 # =============================================================================
 # * Constants
@@ -15,9 +16,9 @@ SEED_OUTPUT = "seed_output.txt"
 RESULT_OUTPUT = "output.txt"
 BINARY_OUTPUT = "binaryout.bin"
 VIDEO_PATH = "resources/test2.mp4"
-NUMBERS_COUNT = 4800000
+NUMBERS_COUNT = 9600000
 
-m = 257         # 8 bits
+m = 257  # 8 bits
 # m = 4294967295  # 32 bits :Sadge:
 # m = 65537       # 16 bits
 
@@ -27,10 +28,10 @@ m = 257         # 8 bits
 
 
 def getSeed(video):
-    value = getRandomPixelValue(video) + 3          # get random pixel's value
+    value = getRandomPixelValue(video) + 3  # get random pixel's value
     result = {
-        "previous_prime": sp.prevprime(value),      # p1
-        "next_prime": sp.nextprime(value)           # p2
+        "previous_prime": sp.prevprime(value),  # p1
+        "next_prime": sp.nextprime(value)  # p2
     }
     result["random_number"] = ((result["previous_prime"] * result["next_prime"]) % m)
     return result
@@ -50,16 +51,16 @@ def getRandomNumber(generated_number, video):
     f = getRandomPixelValue(video) + 3  # get random pixel's value
 
     result = {
-        "previous_prime": sp.prevprime(f),   # previous prime number
-        "next_prime": sp.nextprime(f),       # next prime number
+        "previous_prime": sp.prevprime(f),  # previous prime number
+        "next_prime": sp.nextprime(f),  # next prime number
         "seed_value": f
     }
 
-    a = (result["previous_prime"] * result["next_prime"])                                   # incr
-    b = ((f * generated_number["previous_prime"] * generated_number["next_prime"]) % m)     # multi
-    x = (generated_number["random_number"] * b + a) % m                                     # next
+    a = (result["previous_prime"] * result["next_prime"])  # incr
+    b = ((f * generated_number["previous_prime"] * generated_number["next_prime"]) % m)  # multi
+    x = (generated_number["random_number"] * b + a) % m  # next
 
-    result["random_number"] = (x-1)
+    result["random_number"] = (x - 1)
 
     return result
 
@@ -86,22 +87,22 @@ def xstr(s):  # 'None' as string
 def entropy(labels, base=None):
     value, counts = np.unique(labels, return_counts=True)
     norm_counts = counts / counts.sum()
-    base = e if base is None else base
-    return -(norm_counts * np.log(norm_counts)/np.log(base)).sum()
+    base = 0 if base is None else base
+    return -(norm_counts * np.log(norm_counts) / np.log(base)).sum()
 
 
 def showHistogram(txt_path):
     file = open(txt_path, "r")
     data = np.loadtxt(file)
     fig, ax = plt.subplots()
-    if(txt_path == SEED_OUTPUT):
+    if (txt_path == SEED_OUTPUT):
         top = 255
         tekst = "generowanych przez plik wideo"
         bins = 255
     else:
         top = m - 1
         tekst = "po post-processingu"
-        if(m > 257):
+        if (m > 257):
             bins = m // 100
         else:
             bins = m - 1
@@ -114,7 +115,7 @@ def showHistogram(txt_path):
     ax.set_title("Empiryczny rozkład zmiennych losowych {}\n".format(tekst))
     ax.text(0.12, 0.08, "H(X)={0}\nm={1}".format(round(ent, 5), m), transform=ax.transAxes, fontsize=10, verticalalignment='bottom', bbox=props)
     ax.ticklabel_format(useOffset=False, style='sci')
-    plt.gca().set_ylim(0, histogram[0].max()*1.05)
+    plt.gca().set_ylim(0, histogram[0].max() * 1.05)
     plt.gca().set_xlim(0, top - 1)
     plt.show()
     base = os.path.splitext(os.path.basename(txt_path))
@@ -125,21 +126,20 @@ def showHistogram(txt_path):
 def save_result(number, files):
     print(number["random_number"], file=files["result"])
     print(number["seed_value"], file=files["source"])
-    byte_arr = [int(number["random_number"])]
+    byte_arr = [number["random_number"]]
     binary_format = bytearray(byte_arr)
     files["binary"].write(binary_format)
+
+
 # =============================================================================
 # * Video handling method
 # =============================================================================
-
-
 def loadVideo(path):
-
-    captured_video = cv2.VideoCapture(path)    # load video file
+    captured_video = cv2.VideoCapture(path)  # load video file
     video = {
-        "count": int(captured_video.get(cv2.CAP_PROP_FRAME_COUNT)),        # frames count
-        "height": int(captured_video.get(cv2.CAP_PROP_FRAME_HEIGHT)),      # frame height
-        "width": int(captured_video.get(cv2.CAP_PROP_FRAME_WIDTH))         # frame width
+        "count": int(captured_video.get(cv2.CAP_PROP_FRAME_COUNT)),  # frames count
+        "height": int(captured_video.get(cv2.CAP_PROP_FRAME_HEIGHT)),  # frame height
+        "width": int(captured_video.get(cv2.CAP_PROP_FRAME_WIDTH))  # frame width
     }
     captured_frames = np.empty((video["count"], video["height"], video["width"], 3), np.dtype("uint8"))
 
@@ -156,13 +156,13 @@ def loadVideo(path):
 
 
 def worker():
-    start = time.time()     # start time measure
+    start = time.time()  # start time measure
 
-    video = loadVideo(VIDEO_PATH)           # get video params
-    generated_number = getSeed(video)       # get first frame as seed
+    video = loadVideo(VIDEO_PATH)  # get video params
+    generated_number = getSeed(video)  # get first frame as seed
 
     print("Worker has been launched..")
-    generated_number = getRandomNumber(generated_number, video)     # get first random value
+    generated_number = getRandomNumber(generated_number, video)  # get first random value
 
     index = 0
 
@@ -196,7 +196,6 @@ def worker():
 # =============================================================================
 # * Main --new - reset current output.txt file, --hist - only generate histogram
 # =============================================================================
-
 def main():
     if len(sys.argv) > 1:
         if sys.argv[1] == "--new":
