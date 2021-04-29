@@ -26,15 +26,21 @@ def park():
             x = [0.] * NO_TRIALS
             y = [0.] * NO_TRIALS
             '''first parking'''
-            first = float(int.from_bytes(file.read(4), byteorder='big', signed=False) * RATIO)
-            second = float(int.from_bytes(file.read(4), byteorder='big', signed=False) * RATIO)
+            xtemp = int.from_bytes(file.read(4), byteorder='big', signed=False)
+            first = float(xtemp * RATIO)
+            ytemp = int.from_bytes(file.read(4), byteorder='big', signed=False)
+            second = float(ytemp * RATIO)
+            print(xtemp, ytemp)
             x[0] = first
             y[0] = second
             no_success = 1
 
             for attempt in range(0, NO_TRIALS):
-                first = float(int.from_bytes(file.read(4), byteorder='big', signed=False) * RATIO)
-                second = float(int.from_bytes(file.read(4), byteorder='big', signed=False) * RATIO)
+                xtemp = int.from_bytes(file.read(4), byteorder='big', signed=False)
+                first = float(xtemp * RATIO)
+                ytemp = int.from_bytes(file.read(4), byteorder='big', signed=False)
+                second = float(ytemp * RATIO)
+                print(xtemp, ytemp)
                 crashed = False
                 for i in range(no_success):
                     if math.fabs(x[i - 1] - first) <= 1.0 and math.fabs(y[i - 1] - second) <= 1.0:
@@ -96,5 +102,5 @@ def eof(x, y):
     return x == '' or y == ''
 
 
-#park()
-fakebin()
+park()
+#fakebin()
