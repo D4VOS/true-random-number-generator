@@ -12,7 +12,7 @@ RATIO = 100 / UNIMAX
 def fakebin():
     with open(FAKE, 'wb') as file:
         for i in range(9600000):
-            byte_arr = [i % 255]
+            byte_arr = [1]
             binary_format = bytearray(byte_arr)
             file.write(binary_format)
 
