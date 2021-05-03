@@ -1,12 +1,11 @@
-import time
-import sys
 import os
-from types import ClassMethodDescriptorType
+import sys
+import time
+
 import cv2  # pip install opencv-python
+import matplotlib.pyplot as plt
 import numpy as np
 import sympy as sp
-import matplotlib.pyplot as plt
-import pickle
 
 # =============================================================================
 # * Constants
@@ -19,6 +18,8 @@ VIDEO_PATH = "resources/test2.mp4"
 NUMBERS_COUNT = 9600000
 
 m = 257  # 8 bits
+
+
 # m = 4294967295  # 32 bits :Sadge:
 # m = 65537       # 16 bits
 
@@ -123,12 +124,8 @@ def showHistogram(txt_path):
     file.close()
 
 
-def save_result(number, files):
-    #print(number["random_number"], file=files["result"])
-    #print(number["seed_value"], file=files["source"])
-    byte_arr = [number["random_number"]]
-    binary_format = bytearray(byte_arr)
-    files["binary"].write(binary_format)
+def save_result(buffer, files):
+    files["binary"].write(str(buffer) + "\n")
 
 
 # =============================================================================
@@ -145,7 +142,7 @@ def loadVideo(path):
 
     frameIndex = 0
     flag = True
-    while ((frameIndex < video["count"]) and flag):
+    while (frameIndex < video["count"]) and flag:
         ret, captured_frames[frameIndex] = captured_video.read()
         frameIndex += 1
 
@@ -164,21 +161,27 @@ def worker():
     print("Worker has been launched..")
     generated_number = getRandomNumber(generated_number, video)  # get first random value
 
-    index = 0
-
     files = {
         "result": open(RESULT_OUTPUT, "a"),
         "source": open(SEED_OUTPUT, "a"),
-        "binary": open(BINARY_OUTPUT, "a+b")
+        "binary": open(BINARY_OUTPUT, "a")
     }
-
-    while (index < NUMBERS_COUNT):
+    index = 0
+    buffer = 0x0
+    while index < NUMBERS_COUNT:
         temp_generated_number = getRandomNumber(generated_number, video)
-        if (temp_generated_number["random_number"] == generated_number["random_number"] or temp_generated_number["random_number"] == -1):
+        if temp_generated_number["random_number"] == generated_number["random_number"] or temp_generated_number["random_number"] == -1:
             continue
         else:
             generated_number = temp_generated_number
-            save_result(generated_number, files)
+            if index % 4 == 0 and index != 0:
+                buffer = buffer << 8
+                buffer = buffer ^ generated_number["random_number"]
+                save_result(0xFFFFFFFF & buffer, files)
+                buffer = 0x0
+            else:
+                buffer = buffer << 8
+                buffer = buffer ^ generated_number["random_number"]
             if ((index % int(NUMBERS_COUNT / 10)) == 0) and (index != 0):
                 print(index, "numbers has been generated..")
             index += 1
@@ -188,9 +191,6 @@ def worker():
 
     end = round((time.time() - start), 2)
     print("Done.", NUMBERS_COUNT, "numbers have been generated in", end, "seconds.")  # finish time measure
-
-    showHistogram(RESULT_OUTPUT)
-    showHistogram(SEED_OUTPUT)
 
 
 # =============================================================================
@@ -206,10 +206,6 @@ def main():
                 print("Outputs files have been removed!")
             except Exception as e:
                 print(f"Creating new ones..")
-            finally:
-                file = open(RESULT_OUTPUT, "w")
-                file = open(SEED_OUTPUT, "w")
-                file = open(BINARY_OUTPUT, "a+b")
         if sys.argv[1] == "--hist":
             showHistogram(RESULT_OUTPUT)
             showHistogram(SEED_OUTPUT)
