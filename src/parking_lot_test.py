@@ -3,7 +3,7 @@ import scipy.stats as sc
 import numpy
 import pickle
 
-BINARY_OUTPUT = "binaryout.bin"
+BINARY_OUTPUT = "trn.bin"
 FAKE = "fake.bin"
 
 NO_TRIALS = 12000
@@ -56,8 +56,9 @@ def park():
         pickle.dump(z, fp)
 
     z = kolomagsmirn()
+    print(list(z))
 
-    kstestres = sc.kstest(kolomagsmirn(), 'norm')
+    kstestres = sc.kstest(z, 'norm')
     print(f"\t p-value of KSTEST for those {NO_TESTS} tests: {kstestres}")
 
     # =============================================================================#
@@ -95,6 +96,6 @@ def kolomagsmirn():
         return pickle.load(fp)
 
 
-park()
+#park()
 # fakebin()
-# print(sc.kstest(kolomagsmirn(), 'norm', alternative='less'))
+print(sc.kstest(kolomagsmirn(), 'norm'))
