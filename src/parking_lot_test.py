@@ -50,7 +50,7 @@ def park():
                     no_success += 1
 
             z.append((no_success - 3523.0) / 21.9)
-            print(f"No.{test}\t\t{no_success}")
+            print(f"No.{test}\t\tNo.parked = {no_success}")
 
     with open('./zout.txt', 'wb') as fp:
         pickle.dump(z, fp)
