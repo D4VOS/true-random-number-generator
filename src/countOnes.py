@@ -82,5 +82,12 @@ def showHistogram(data, title: str):
     plt.show()
     y_axis = lambda x: np.ones_like(x) / len(x)
 
+def getWordProb(word: str):
+    prob = LETTERS_PROBE[word[0]] / 256
+    for letter in word[1:]:
+        prob *= LETTERS_PROBE[letter] / 256
+    return prob / 5 ** len(word)
+
+
 if __name__ == "__main__":
     countOnes()
