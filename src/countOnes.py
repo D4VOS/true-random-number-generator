@@ -1,11 +1,14 @@
-import numpy as np
 from collections import Counter
-import scipy.stats as sc
+import math
 import matplotlib.pyplot as plt
-import seaborn as sb
+import numpy as np
+import scipy.stats as sc
+import random
 
 BINARY_OUTPUT = "random.bin"
-LETTERS_PROBE = {'A': 37, 'B': 56, 'C': 70, 'D': 56, 'E': 37}
+LETTERS_PROBE = [37 / 256, 56 / 256, 70 / 256, 56 / 256, 37 / 256]
+LETTERS = ['A', 'B', 'C', 'D', 'E']
+
 
 def countOnes():
     with open(BINARY_OUTPUT, 'rb') as f:
@@ -16,7 +19,8 @@ def countOnes():
     for item in file_array:
         for i in int32_to_int8(item)[::-1]:
             numbers.append(i)
-    print(len(numbers))  # -> 1 024 000 liczb 8-bitowych
+    # print(f'8-bitowych liczb: {len(numbers)}')  # -> 1 024 000 liczb 8-bitowych
+    '''numbers = genNumbers(9600000)'''
 
     bins = []
     letters = []
@@ -25,10 +29,10 @@ def countOnes():
         for bit in np.binary_repr(item, 8):
             bins.append(bit)
 
-    print(len(bins))
-    for i in range(0, 1024000):
+    # print(f'bitów: {len(bins)}')
+    for i in range(0, 256000 + 5):
         counter = 0
-        for bit in bins[i*8:i*8+8]:
+        for bit in bins[i * 8:i * 8 + 8]:
             counter += 1 if bit == '1' else 0
         if counter <= 2:
             letters.append('A')
@@ -41,20 +45,19 @@ def countOnes():
         elif counter >= 6:
             letters.append('E')
 
-    print(len(letters))
-
+    # print(f'liter: {len(letters)}')
+    expProbs = getExpectedProbs()
+    words4, words5 = dict(), dict()
     words4, counts4 = connectLetters(letters, word_length=4)
     words5, counts5 = connectLetters(letters, word_length=5)
-    print(len(words4), len(words4))
-    print(len(words5), len(words5))
-    stat4, chi4 = sc.chisquare(counts4)
-    stat5, chi5 = sc.chisquare(counts5)
 
-    y_axis = lambda x: np.ones_like(x) / len(x)
-    showHistogram(counts4, "Rozkład wystąpień wyrazów 4-literowych")
-    showHistogram(counts5, "Rozkład wystąpień wyrazów 5-literowych")
-    print(chi4, chi5)
-    print(f"Oryg. ChiSquare result= {stat5 - stat4}, Q5= {stat5}, Q4= {stat4}")
+    chi4 = chiCalc(words4, counts4, expProbs)
+    chi5 = chiCalc(words5, counts5, expProbs)
+    print(f"Q5={round(chi5, 2)}, Q4={round(chi4, 2)}\n"
+          f"Q5-Q4={round(chi5 - chi4, 2)}")
+
+    showHistogram(counts4, "\n\nRozkład częstotliwości wystąpień wyrazów 4-literowych")
+    showHistogram(counts5, "Rozkład częstotliwości wystąpień wyrazów 5-literowych")
 
 
 def int32_to_int8(n):
@@ -64,30 +67,51 @@ def int32_to_int8(n):
 
 def connectLetters(list_of_letters: list, word_length: int):
     words = list()
-    for letter in range(0, int(1024000/word_length)):
+    for letter in range(0, 256000):
         word = "".join(list_of_letters[letter:letter + word_length])
         words.append(word)
-    print(len(words))
-    result = Counter(words)
-    return list(result.keys()), list(result.values())
+    # print(f'utworzone {word_length}-literowe słowa: {len(words)}')
+    unique = Counter(words)
+    return list(unique.keys()), list(unique.values())
+
+
+def genNumbers(count):
+    return [random.randrange(255) for _ in range(count)]
+
+
+def chiCalc(data, count, probs):
+    chi = 0
+    for k, v in zip(data, count):
+        chi += ((v - probs[k]) ** 2) / probs[k]
+        # print(f"{k}->({v}-{probs[k]})^2/{probs[k]}=={((v - probs[k]) ** 2) / probs[k]}")
+    return chi
+
 
 def showHistogram(data, title: str):
-    sb.set_style("whitegrid")  # Setting style(Optional)
-    plt.figure(figsize=(10, 5))  # Specify the size of figure we want(Optional)
-    sb.distplot(x=data, bins=20, kde=True, color='teal',
-                kde_kws=dict(linewidth=2, color='black'))
+    density = sc.gaussian_kde(data)
+    n, x, _ = plt.hist(data, bins=20,
+                       histtype='bar', density=True)
+    plt.plot(x, density(x))
     plt.title(title)
-    plt.xlim()
-    #plt.bar(range(len(data)), data)
     plt.show()
-    y_axis = lambda x: np.ones_like(x) / len(x)
 
-def getWordProb(word: str):
-    prob = LETTERS_PROBE[word[0]] / 256
-    for letter in word[1:]:
-        prob *= LETTERS_PROBE[letter] / 256
-    return prob / 5 ** len(word)
+
+def getExpectedProbs():
+    probs = {}
+    for word_length in [4, 5]:
+        for possible_word in range(5 ** word_length):
+            exp_freq = 256000
+            word = possible_word
+            chars = []
+            for _ in range(word_length):
+                chars.append(LETTERS[word % 5])
+                exp_freq *= LETTERS_PROBE[word % 5]
+                word = math.floor(word / 5)
+                # print(exp_freq)
+            probs[''.join(chars)] = exp_freq
+    return probs
 
 
 if __name__ == "__main__":
     countOnes()
+    # getExpectedProbs()
