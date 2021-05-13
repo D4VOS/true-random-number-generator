@@ -1,25 +1,53 @@
-import numpy as np
-import scipy.stats as sc
+import random
+
 import matplotlib.pyplot as plt
-import matplotlib.ticker
+import numpy as np
+from scipy.stats import *
 
-BINARY_OUTPUT = "random.bin"
+BINARY_OUTPUT = "binaryout.bin"
 
-filein = open(BINARY_OUTPUT, 'rb')
-#file_array = np.fromfile(flile, dtype=np.int32, count= 4, sep="")
-file_array = filein.readlines()
-file_array = np.uint32(file_array)
-print(file_array)
-file_array_float = file_array.astype(np.float32)/4294967295
-print(file_array_float)
-sums = list()
-#print(len(file_array_float))
-#for i in range(0, len(file_array_float)):
-#  print(i)
-#  sums.append(sum(file_array_float[i:len(file_array_float)]))
-for i in range(0, 1000):
-   #print(i)
-   sums.append(sum(file_array_float[i:1000]))
-plt.hist(sums, bins = 1000)
-plt.show()  
-print(sums[0:1000])
+
+def overlap():
+    with open(BINARY_OUTPUT, 'rb') as f:
+        floats = []
+        [floats.append(int(i.strip()) / 4294967295) for i in f.readlines()]
+    '''for i in range(2400000):
+        number = random.randint(0, 255)
+        floats.append(number/255)'''
+
+    tmp = []
+    [tmp.append(sum([floats[j]/100 for j in range(i, i + 100)])) for i in range(len(floats) - 100)]
+    tmp.sort()
+    print(len(tmp), np.mean(tmp))
+    x = np.linspace(tmp[0], tmp[len(tmp) - 1], num=len(tmp) - 1)
+    print(f'x={x}, len={len(tmp)},\n{normaltest(tmp)}')
+    y_axis = np.ones_like(tmp) / len(tmp)
+    plt.hist(tmp, bins=300, weights=y_axis)
+    plt.show()
+
+
+def shittyoverlappingsums():
+    print("\n\n\nOverlapping sums:")
+    try:
+        with open(BINARY_OUTPUT, 'rb') as f:
+            floats = []
+            [floats.append(int(i.strip()) / 4294967295) for i in f.readlines() if i.strip()]
+
+        f.close()
+
+        tmp = []
+        [tmp.append(sum([floats[j] for j in range(i, i + 100)])) for i in range(len(floats) - 100)]
+        tmp.sort()
+        x = np.linspace(tmp[0], tmp[len(tmp) - 1], num=len(tmp) - 1)
+        print(f'x={x}, len={len(tmp)},\n{kstest(x, "norm")}')
+
+        # return [sum([floats[j] for j in range(i, i + 100)]) for i in range(len(floats) - 100)] # if u want to use them (rocket science here, fuck u PEP8.)
+        plt.hist(tmp)
+        plt.show()
+    except Exception as e:
+        print(e)
+
+    return
+
+
+overlap()
