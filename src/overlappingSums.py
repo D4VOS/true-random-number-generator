@@ -1,7 +1,4 @@
-import random
-
 import matplotlib.pyplot as plt
-import numpy as np
 from scipy.stats import *
 
 BINARY_OUTPUT = "binaryout.bin"

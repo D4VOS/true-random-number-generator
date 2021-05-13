@@ -1,7 +1,7 @@
 import math
-import scipy.stats as sc
-import numpy
 import pickle
+
+import scipy.stats as sc
 
 BINARY_OUTPUT = "trn.bin"
 FAKE = "fake.bin"
