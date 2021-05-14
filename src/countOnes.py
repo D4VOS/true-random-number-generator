@@ -1,4 +1,5 @@
 import math
+import gc
 import random
 from collections import Counter
 
@@ -135,3 +136,4 @@ if __name__ == "__main__":
     for i in range(24):
         p_vals.append(countOnes(i, numbers))
     print(f"Mean p-value={round(np.mean(p_vals), 6)}")
+    gc.collect()
