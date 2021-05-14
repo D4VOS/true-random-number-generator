@@ -6,22 +6,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.stats as sc
 
-BINARY_OUTPUT = "random.bin"
+BINARY_OUTPUT = "binaryout.bin"
 LETTERS_PROBE = [37 / 256, 56 / 256, 70 / 256, 56 / 256, 37 / 256]
-LETTERS = ['A','B', 'C', 'D', 'E']
+LETTERS = ['A', 'B', 'C', 'D', 'E']
+MEAN = 2500
+STD = math.sqrt(5000)
 
 
-def countOnes() -> None:
-    with open(BINARY_OUTPUT, 'rb') as f:
-        file_array = []
-        [file_array.append(int(i.strip())) for i in f.readlines()]
-    numbers = []
-
-    for item in file_array:
-        for i in int32_to_int8(item)[::-1]:
-            numbers.append(i)
-    '''numbers = genNumbers(9600000)'''  # <- generate with random lib
-
+def countOnes(no_test: int, numbers: list[int]) -> float:
+    print(f'TEST No.{no_test + 1}.')
     bins = []
     letters = []
     for item in numbers:
@@ -47,14 +40,39 @@ def countOnes() -> None:
     expected_freq = getExpectedProbs()
     words4, counts4 = connectLetters(letters, word_length=4)
     words5, counts5 = connectLetters(letters, word_length=5)
-
+    if len(counts4) > 625:
+        print(words4)
+        input("Wcisnij klawisz aby kontynuować..")
+    if len(counts5) > 3125:
+        print(words5)
+        input("Wcisnij klawisz aby kontynuować..")
     chi4 = chiCalc(words4, counts4, expected_freq)
     chi5 = chiCalc(words5, counts5, expected_freq)
+    chi = chi5 - chi4
+    z = (chi - MEAN) / STD
+    p = 1 - Phi(z)
     print(f"Q5={round(chi5, 2)}, Q4={round(chi4, 2)}\n"
-          f"Q5-Q4={round(chi5 - chi4, 2)}")
+          f"chisquare={round(chi, 2)}\tz-score={round(z, 3)}\tp-value={round(p, 6)}\n")
 
-    showHistogram(counts4, "\n\nRozkład częstotliwości wystąpień wyrazów 4-literowych", 4)
-    showHistogram(counts5, "Rozkład częstotliwości wystąpień wyrazów 5-literowych", 5)
+    return p
+    # showHistogram(counts4, "\n\nRozkład częstotliwości wystąpień wyrazów 4-literowych", 4)
+    # showHistogram(counts5, "Rozkład częstotliwości wystąpień wyrazów 5-literowych", 5)
+
+def fileTo8bits(path) -> list[int]:
+    file_array = []
+    with open(path, 'rb') as f:
+        [file_array.append(int(i.strip())) for i in f.readlines()]
+    numbers = []
+    for item in file_array:
+        for i in int32_to_int8(item)[::-1]:
+            numbers.append(i)
+    del file_array
+    return numbers
+
+def Phi(z):
+    tmp = z/math.sqrt(2.)
+    tmp = 1 + math.erf(tmp)
+    return tmp / 2
 
 
 def int32_to_int8(n) -> list[int]:
@@ -87,7 +105,7 @@ def chiCalc(data, count, probs) -> int:
 def showHistogram(data, title: str, word_length: int) -> None:
     density = sc.gaussian_kde(data)
     div = 15 if word_length == 5 else 17
-    n, x, _ = plt.hist(data, bins=len(data)//div,
+    n, x, _ = plt.hist(data, bins=len(data) // div,
                        histtype='bar', density=True)
     plt.plot(x, density(x))
     plt.title(title)
@@ -111,4 +129,9 @@ def getExpectedProbs() -> dict[str, int]:
 
 
 if __name__ == "__main__":
-    countOnes()
+    #numbers = fileTo8bits(BINARY_OUTPUT)  # <- load from file #todo
+    numbers = genNumbers(9600000)  # <- generate with random lib
+    p_vals = []
+    for i in range(24):
+        p_vals.append(countOnes(i, numbers))
+    print(f"Mean p-value={round(np.mean(p_vals), 6)}")
