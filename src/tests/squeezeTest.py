@@ -86,7 +86,7 @@ def showHistogram(freq: list[int]) -> None:
 
 def showBars(freq: list[int]) -> None:
     x_axis = np.linspace(0, len(freq) - 1, num=len(freq))
-    plt.hist(freq, bins=len(freq), weights=np.zeros_like(freq) + 1. / len(freq))
+    plt.hist(freq, bins=len(freq)//2, weights=np.zeros_like(freq) + 1. / len(freq))
     plt.title("Empiryczny rozkład wartości p")
     plt.xlabel("Wartość")
     plt.ylabel("Częstotliwość występowania")

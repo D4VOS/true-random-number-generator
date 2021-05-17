@@ -6,8 +6,8 @@ from essentials import *
 SEED_OUTPUT = "seed_output.txt"
 RESULT_OUTPUT = "binaryout.bin"
 VIDEO_PATH = "resources/test2.mp4"
-NUMBERS_COUNT = 9600000
-m = 257  # 8 bits
+NUMBERS_COUNT = 1000000
+M = 257  # 8 bits
 
 
 # =============================================================================
@@ -20,7 +20,7 @@ def getSeed(video):
         "previous_prime": sp.prevprime(value),  # p1
         "next_prime": sp.nextprime(value)  # p2
     }
-    result["random_number"] = ((result["previous_prime"] * result["next_prime"]) % m)
+    result["random_number"] = ((result["previous_prime"] * result["next_prime"]) % M)
     return result
 
 
@@ -47,8 +47,8 @@ def getRandomNumber(generated_number, video):
     }
 
     a = (result["previous_prime"] * result["next_prime"])  # incr
-    b = ((f * generated_number["previous_prime"] * generated_number["next_prime"]) % m)  # multi
-    x = (generated_number["random_number"] * b + a) % m  # next
+    b = ((f * generated_number["previous_prime"] * generated_number["next_prime"]) % M)  # multi
+    x = (generated_number["random_number"] * b + a) % M  # next
 
     result["random_number"] = (x - 1)
     return result
@@ -66,12 +66,12 @@ def showHistogram(txt_path):
         text = "generowanych przez plik wideo"
         bins = 255
     else:
-        top = m - 1
+        top = M - 1
         text = "po post-processingu"
-        if m > 257:
-            bins = m // 100
+        if M > 257:
+            bins = M // 100
         else:
-            bins = m - 1
+            bins = M - 1
     props = dict(boxstyle='round', facecolor='wheat', alpha=0.7)
     histogram = ax.hist(data, histtype='bar', density=True, stacked=True, bins=bins, range=[0, top])
     ent = entropy(data, base=2)
@@ -79,19 +79,19 @@ def showHistogram(txt_path):
     ax.set_xlabel("Wartość (x{})".format(get_sub('i')))
     ax.set_ylabel("Częstotliwość występowania (p{})".format(get_sub('i')))
     ax.set_title("Empiryczny rozkład zmiennych losowych {}\n".format(text))
-    ax.text(0.12, 0.08, "H(X)={0}\nm={1}".format(round(ent, 5), m), transform=ax.transAxes, fontsize=10, verticalalignment='bottom', bbox=props)
+    ax.text(0.12, 0.08, "H(X)={0}\nM={1}".format(round(ent, 5), M), transform=ax.transAxes, fontsize=10, verticalalignment='bottom', bbox=props)
     ax.ticklabel_format(useOffset=False, style='sci')
     plt.gca().set_ylim(0, histogram[0].max() * 1.05)
     plt.gca().set_xlim(0, top - 1)
     plt.show()
     base = os.path.splitext(os.path.basename(txt_path))
-    fig.savefig('charts/{0}_m_{1}.png'.format(base[0], m), dpi=fig.dpi)
+    fig.savefig('charts/{0}_m_{1}.png'.format(base[0], M), dpi=fig.dpi)
     file.close()
 
 
 def save_result(buffer, files):  # todo rework
     """Saving number to binary file"""
-    files["binary"].write(str(buffer) + "\n")
+    files["binary"].write(struct.pack('B', buffer))
 
 
 # =============================================================================
@@ -131,25 +131,16 @@ def worker():
 
     files = {
         "source": open(SEED_OUTPUT, "a"),
-        "binary": open(RESULT_OUTPUT, "a")
+        "binary": open(RESULT_OUTPUT, "wb")
     }
     index = 0
-    buffer = 0x0
     while index < NUMBERS_COUNT:
         temp_generated_number = getRandomNumber(generated_number, video)
         if temp_generated_number["random_number"] == generated_number["random_number"] or temp_generated_number["random_number"] == -1:
             continue
         else:
             generated_number = temp_generated_number
-            if index % 4 == 0 and index != 0:  # collect 4 bytes and save as 32-bit value
-                buffer = buffer << 8  #
-                buffer = buffer ^ generated_number["random_number"]  #
-                save_result(0xFFFFFFFF & buffer, files)  #
-                buffer = 0x0  #
-            else:  #
-                buffer = buffer << 8  #
-                buffer = buffer ^ generated_number["random_number"]  #
-
+            save_result(generated_number['random_number'], files)
             if ((index % int(NUMBERS_COUNT / 10)) == 0) and (index != 0):
                 print(index, "numbers has been generated..")
             index += 1
@@ -181,4 +172,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    import cProfile
+    cProfile.run('main()')

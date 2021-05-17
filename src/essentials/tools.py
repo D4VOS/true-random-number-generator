@@ -10,6 +10,7 @@ from collections import Counter
 from scipy import stats as sc
 import sympy as sp
 import gc
+import struct
 
 
 def genNumbers(count: int, bits: int, normalized: bool = False) -> list[int]:

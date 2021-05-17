@@ -57,7 +57,6 @@ def init(numbers: list[int], histogram: bool = False):
 
 
 def showHistogram(freq: list[int], title: str) -> None:
-    x_axis = np.linspace(1, len(freq), num=len(freq))
     plt.hist(freq, bins=20, stacked=True, weights=np.zeros_like(freq) + 1. / len(freq))
     plt.title(title)
     plt.xlabel("Wartość")
