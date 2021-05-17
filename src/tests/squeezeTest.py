@@ -4,9 +4,6 @@ NO_SAMPLES = 2400000  # should be at least 2.3 million
 NO_TESTS = 100000  # don't change this
 RATIO = NO_TESTS / 1000000
 
-MEAN = 23255.81395
-STD = 28536.66352
-
 EXPECTED = [21.03, 57.79, 175.54, 467.32, 1107.83, 2367.84,
             4609.44, 8241.16, 13627.81, 20968.49, 30176.12, 40801.97, 52042.03,
             62838.28, 72056.37, 78694.51, 82067.55, 81919.35, 78440.08, 72194.12,
@@ -19,27 +16,49 @@ def init(numbers: list[int], histogram: bool = False):
     p_val = []
     print(f"Squeeze Test: ", end="")
     freq = [0] * 43  # init empty freq array
-    exp_freq = [RATIO * EXPECTED[i] for i in range(43)]
+    exp_freq = [RATIO * EXPECTED[i] for i in range(len(EXPECTED))]
     floats = [numbers[i] / 4294967296 for i in range(len(numbers))]  # -> [0;1)
     current_index = 0
     for _ in range(NO_TESTS):
         k = 2147483647
         j = 0
-        while k >= 1 and j < 48:
-            k *= floats[current_index]
+        while k != 1 and j < 48:
+            k = math.ceil(floats[current_index]*k)
             j += 1
             current_index += 1
         j = 6 if j < 6 else j
         freq[j - 6] += 1
+
     chsq = chiCalc(freq, exp_freq)
-    z = (chsq - MEAN) / STD
-    p = 1 - Phi(z)
+    p = 1 - Chisq(42, chsq)
     print(f"p-value={round(p, 6)} ", end="")
     if 0.025 < p < 0.975:
         print("PASSED")
     else:
         print("FAILED")
     if histogram: showHistogram(freq)
+
+
+def G(z):
+    tmp = 2 * z
+    if tmp != 2 * z or z == 0: print("Error in calling G(z)!!!")
+    if tmp == 1:
+        return sqrt(PI)
+    elif tmp == 2:
+        return 1
+
+    return (z - 1) * G(z - 1)
+
+
+def Chisq(df: int, x: float):
+    if df == 1: return 2 * Phi(math.sqrt(x))
+    elif df == 2: return 1 - math.exp(-x / 2)
+
+    return Chisq(df - 2, x) - 2 * chisq(df, x)
+
+
+def chisq(df: int, x: float):
+    return math.pow(x / 2, (df - 2) / 2.) * math.exp(-x / 2) / (2 * G(df / 2.))
 
 
 def showHistogram(freq: list[int]) -> None:
@@ -58,7 +77,7 @@ def showHistogram(freq: list[int]) -> None:
 
 def chiCalc(result: list[int], exp_freq: list[int]) -> float:
     chsq = 0
-    for i in range(43):
+    for i in range(len(exp_freq)):
         tmp = (result[i] - exp_freq[i]) / math.sqrt(exp_freq[i])
         chsq += tmp * tmp
     return chsq
