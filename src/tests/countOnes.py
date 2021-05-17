@@ -43,7 +43,7 @@ def init(numbers: list[int], histogram: bool = False) -> float:
         chsq = chi5 - chi4
         z = (chsq - MEAN) / STD
         p = 1 - Phi(z)
-        #print(f"chisquare={round(chsq, 2)}\tz-score={round(z, 3)}\tp-value={round(p, 6)}")
+        # print(f"chisquare={round(chsq, 2)}\tz-score={round(z, 3)}\tp-value={round(p, 6)}")
 
         p_vals.append(p)
     _, p_value = sc.kstest(p_vals, 'uniform')
@@ -75,7 +75,7 @@ def connectLetters(list_of_letters: list, word_length: int) -> tuple[list[str], 
 
 def showBars(freq: list[int]) -> None:
     x_axis = np.linspace(0, len(freq) - 1, num=len(freq))
-    plt.hist(freq, weights=np.zeros_like(freq)+1./ len(freq))
+    plt.hist(freq, weights=np.zeros_like(freq) + 1. / len(freq))
     plt.title("Empiryczny rozkład wartości p")
     plt.xlabel("Wartość")
     plt.ylabel("Częstotliwość występowania")

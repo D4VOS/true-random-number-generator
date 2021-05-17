@@ -14,6 +14,7 @@ m = 257  # 8 bits
 # * Random number generate methods
 # =============================================================================
 def getSeed(video):
+    """Returns seed for generator"""
     value = getRandomPixelValue(video) + 3  # get random pixel's value
     result = {
         "previous_prime": sp.prevprime(value),  # p1
@@ -24,16 +25,19 @@ def getSeed(video):
 
 
 def getRandomPixelValue(video):
+    """Returns pixel value based on system clock value"""
     current_time = time.time() * 1000  # get system_clock
 
-    rand_x = int(current_time % video["width"])
-    rand_y = int(current_time % video["height"])
+    posX = int(current_time % video["width"])
+    posY = int(current_time % video["height"])
 
-    # return video["frames"][((rand_x * rand_y) % video["count"]), rand_y, rand_x, ((rand_x * rand_y) % 3)]  # [frame_no, height, width, [R,G,B]]
-    return video["frames"][((rand_x * rand_y) % video["count"]), rand_y, rand_x, ((rand_x * rand_y) % 3)]  # [frame_no, height, width, [R,G,B]]
+    no_frame = (posX * posY) % video["count"]
+
+    return video["frames"][no_frame, posY, posX, ((posX * posY) % 3)]  # [frame_no, height, width, [R,G,B]]
 
 
 def getRandomNumber(generated_number, video):
+    """Generate random number using vision source and specific expressions"""
     f = getRandomPixelValue(video) + 3  # get random pixel's value
 
     result = {
@@ -47,7 +51,6 @@ def getRandomNumber(generated_number, video):
     x = (generated_number["random_number"] * b + a) % m  # next
 
     result["random_number"] = (x - 1)
-
     return result
 
 
@@ -58,14 +61,14 @@ def showHistogram(txt_path):
     file = open(txt_path, "r")
     data = np.loadtxt(file)
     fig, ax = plt.subplots()
-    if (txt_path == SEED_OUTPUT):
+    if txt_path == SEED_OUTPUT:
         top = 255
-        tekst = "generowanych przez plik wideo"
+        text = "generowanych przez plik wideo"
         bins = 255
     else:
         top = m - 1
-        tekst = "po post-processingu"
-        if (m > 257):
+        text = "po post-processingu"
+        if m > 257:
             bins = m // 100
         else:
             bins = m - 1
@@ -75,7 +78,7 @@ def showHistogram(txt_path):
     ax.set_ylim([0, max(histogram[0])])
     ax.set_xlabel("Wartość (x{})".format(get_sub('i')))
     ax.set_ylabel("Częstotliwość występowania (p{})".format(get_sub('i')))
-    ax.set_title("Empiryczny rozkład zmiennych losowych {}\n".format(tekst))
+    ax.set_title("Empiryczny rozkład zmiennych losowych {}\n".format(text))
     ax.text(0.12, 0.08, "H(X)={0}\nm={1}".format(round(ent, 5), m), transform=ax.transAxes, fontsize=10, verticalalignment='bottom', bbox=props)
     ax.ticklabel_format(useOffset=False, style='sci')
     plt.gca().set_ylim(0, histogram[0].max() * 1.05)
@@ -86,7 +89,8 @@ def showHistogram(txt_path):
     file.close()
 
 
-def save_result(buffer, files):
+def save_result(buffer, files):  # todo rework
+    """Saving number to binary file"""
     files["binary"].write(str(buffer) + "\n")
 
 
@@ -94,6 +98,7 @@ def save_result(buffer, files):
 # * Video handling method
 # =============================================================================
 def loadVideo(path):
+    """Capture vision source to array"""
     captured_video = cv2.VideoCapture(path)  # load video file
     video = {
         "count": int(captured_video.get(cv2.CAP_PROP_FRAME_COUNT)),  # frames count
@@ -115,6 +120,7 @@ def loadVideo(path):
 
 
 def worker():
+    """Main worker"""
     start = time.time()  # start time measure
 
     video = loadVideo(VIDEO_PATH)  # get video params
@@ -135,14 +141,15 @@ def worker():
             continue
         else:
             generated_number = temp_generated_number
-            if index % 4 == 0 and index != 0:
-                buffer = buffer << 8
-                buffer = buffer ^ generated_number["random_number"]
-                save_result(0xFFFFFFFF & buffer, files)
-                buffer = 0x0
-            else:
-                buffer = buffer << 8
-                buffer = buffer ^ generated_number["random_number"]
+            if index % 4 == 0 and index != 0:  # collect 4 bytes and save as 32-bit value
+                buffer = buffer << 8  #
+                buffer = buffer ^ generated_number["random_number"]  #
+                save_result(0xFFFFFFFF & buffer, files)  #
+                buffer = 0x0  #
+            else:  #
+                buffer = buffer << 8  #
+                buffer = buffer ^ generated_number["random_number"]  #
+
             if ((index % int(NUMBERS_COUNT / 10)) == 0) and (index != 0):
                 print(index, "numbers has been generated..")
             index += 1

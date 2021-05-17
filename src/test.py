@@ -1,4 +1,3 @@
-from essentials import *
 from tests import *
 
 
@@ -10,6 +9,7 @@ def main():
     parkingLot.init(data, True)
 
     gc.collect()
+
 
 if __name__ == "__main__":
     main()
