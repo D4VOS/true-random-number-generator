@@ -1,4 +1,4 @@
-from src.essentials import *
+from essentials import *
 
 NO_SAMPLES = 2400000  # should be at least 2.3 million
 NO_TESTS = 100000  # don't change this

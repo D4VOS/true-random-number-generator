@@ -1,4 +1,5 @@
-from src.essentials import *
+from essentials import *
+
 
 LETTERS_PROBE = [37 / 256, 56 / 256, 70 / 256, 56 / 256, 37 / 256]
 LETTERS = ['A', 'B', 'C', 'D', 'E']
