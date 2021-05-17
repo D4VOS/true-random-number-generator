@@ -43,10 +43,10 @@ def init(numbers: list[int], histogram: bool = False):
         z_score = (no_success - 3523.0) / 21.9
         p_val = 1 - Phi(z_score)
         p.append(p_val)
-        #print(f"No.{test + 1}\t\tNo.parked = {no_success} p_value= {round(p_val, 6)}")
+        # print(f"No.{test + 1}\t\tNo.parked = {no_success} p_value= {round(p_val, 6)}")
         successes.append(no_success)
     _, pvalue = sc.kstest(p, 'uniform')
-    print(f"p-value={round(pvalue, 6)} ", end="")
+    print(f"after 100 tests: p-value={round(pvalue, 6)} ", end="")
     if 0.025 < pvalue < 0.975:
         print("PASSED")
     else:
@@ -58,7 +58,7 @@ def init(numbers: list[int], histogram: bool = False):
 
 def showHistogram(freq: list[int], title: str) -> None:
     x_axis = np.linspace(1, len(freq), num=len(freq))
-    plt.hist(freq, bins=20, stacked=True, weights=np.zeros_like(freq)+1./ len(freq))
+    plt.hist(freq, bins=20, stacked=True, weights=np.zeros_like(freq) + 1. / len(freq))
     plt.title(title)
     plt.xlabel("Wartość")
     plt.ylabel("Częstotliwość występowania")

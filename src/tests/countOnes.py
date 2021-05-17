@@ -1,6 +1,5 @@
 from essentials import *
 
-
 LETTERS_PROBE = [37 / 256, 56 / 256, 70 / 256, 56 / 256, 37 / 256]
 LETTERS = ['A', 'B', 'C', 'D', 'E']
 MEAN = 2500
@@ -44,11 +43,11 @@ def init(numbers: list[int], histogram: bool = False) -> float:
         chsq = chi5 - chi4
         z = (chsq - MEAN) / STD
         p = 1 - Phi(z)
-        # print(f"chisquare={round(chsq, 2)}\tz-score={round(z, 3)}\tp-value={round(p, 6)}")
+        #print(f"chisquare={round(chsq, 2)}\tz-score={round(z, 3)}\tp-value={round(p, 6)}")
 
         p_vals.append(p)
     _, p_value = sc.kstest(p_vals, 'uniform')
-    print(f"p-value={round(p_value, 6)} ", end="")
+    print(f"after 24 tests: p-value={round(p_value, 6)} ", end="")
     if 0.025 < p_value < 0.975:
         print("PASSED")
     else:
@@ -76,7 +75,7 @@ def connectLetters(list_of_letters: list, word_length: int) -> tuple[list[str], 
 
 def showBars(freq: list[int]) -> None:
     x_axis = np.linspace(0, len(freq) - 1, num=len(freq))
-    plt.hist(freq, weights=np.zeros_like(freq) + 1. / len(freq))
+    plt.hist(freq, bins=len(freq), weights=np.zeros_like(freq) + 1. / len(freq))
     plt.title("Empiryczny rozkład wartości p")
     plt.xlabel("Wartość")
     plt.ylabel("Częstotliwość występowania")
@@ -91,11 +90,10 @@ def chiCalc(data, count, probs) -> int:
 
 
 def showHistogram(data, title: str, word_length: int) -> None:
-    density = sc.gaussian_kde(data)
-    div = 15 if word_length == 5 else 17
-    n, x, _ = plt.hist(data, bins=len(data) // div,
-                       histtype='bar', density=True)
-    plt.plot(x, density(x))
+    total = sum(data)
+    x_axis = np.linspace(0, len(data) - 1, num=len(data))
+    y_axis = [data[i] / total for i in range(len(data))]
+    plt.plot(x_axis, y_axis)
     plt.title(title)
     plt.xlabel("Wartość")
     plt.ylabel("Częstotliwość występowania")

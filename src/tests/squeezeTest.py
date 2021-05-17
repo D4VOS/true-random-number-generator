@@ -16,28 +16,34 @@ EXPECTED = [21.03, 57.79, 175.54, 467.32, 1107.83, 2367.84,
 def init(numbers: list[int], histogram: bool = False):
     p_val = []
     print(f"Squeeze Test: ", end="")
-    freq = [0] * 43  # init empty freq array
     exp_freq = [RATIO * EXPECTED[i] for i in range(len(EXPECTED))]
     floats = [numbers[i] / 4294967296 for i in range(len(numbers))]  # -> [0;1)
     current_index = 0
-    for _ in range(NO_TESTS):
-        k = 2147483647
-        j = 0
-        while k != 1 and j < 48:
-            k = math.ceil(floats[current_index]*k)
-            j += 1
-            current_index += 1
-        j = 6 if j < 6 else j
-        freq[j - 6] += 1
-
-    chsq = chiCalc(freq, exp_freq)
-    p = 1 - Chisq(42, chsq)
-    print(f"p-value={round(p, 6)} ", end="")
-    if 0.025 < p < 0.975:
+    p_vals = []
+    for test in range(20):
+        freq = [0] * 43  # init empty freq array
+        for _ in range(NO_TESTS):
+            k = 2147483647
+            j = 0
+            while k != 1 and j < 48:
+                k = math.ceil(floats[current_index] * k)
+                j += 1
+                current_index += 1
+            j = 6 if j < 6 else j
+            freq[j - 6] += 1
+        chsq = chiCalc(freq, exp_freq)
+        p = 1 - Chisq(42, chsq)
+        p_vals.append(p)
+        # print(f"p-value={round(p, 6)} ", end="")
+    _, p_value = sc.kstest(p_vals, 'uniform')
+    print(f"after 20 tests: p-value={round(p_value, 6)} ", end="")
+    if 0.025 < p_value < 0.975:
         print("PASSED")
     else:
         print("FAILED")
-    if histogram: showHistogram(freq)
+    if histogram:
+        showHistogram(freq)
+        showBars(p_vals)
 
 
 def G(z):
@@ -52,8 +58,10 @@ def G(z):
 
 
 def Chisq(df: int, x: float):
-    if df == 1: return 2 * Phi(math.sqrt(x))
-    elif df == 2: return 1 - math.exp(-x / 2)
+    if df == 1:
+        return 2 * Phi(math.sqrt(x))
+    elif df == 2:
+        return 1 - math.exp(-x / 2)
 
     return Chisq(df - 2, x) - 2 * chisq(df, x)
 
@@ -65,7 +73,7 @@ def chisq(df: int, x: float):
 def showHistogram(freq: list[int]) -> None:
     total = sum(freq)
     total_exp = sum(EXPECTED)
-    x_axis = np.linspace(0, len(freq) - 1, num=len(freq))
+    x_axis = np.linspace(6, len(freq) - 1 + 6, num=len(freq))
     y_axis = [freq[i] / total for i in range(len(freq))]
     plt.bar(x_axis, y_axis)
     y_axis = [EXPECTED[i] / total_exp for i in range(len(EXPECTED))]
@@ -73,6 +81,15 @@ def showHistogram(freq: list[int]) -> None:
     plt.title("Empiryczny rozkład ilości iteracji")
     plt.ylabel("Częstotliwość występowania")
     plt.legend(loc="upper right")
+    plt.show()
+
+
+def showBars(freq: list[int]) -> None:
+    x_axis = np.linspace(0, len(freq) - 1, num=len(freq))
+    plt.hist(freq, bins=len(freq), weights=np.zeros_like(freq) + 1. / len(freq))
+    plt.title("Empiryczny rozkład wartości p")
+    plt.xlabel("Wartość")
+    plt.ylabel("Częstotliwość występowania")
     plt.show()
 
 
