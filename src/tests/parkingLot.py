@@ -1,4 +1,4 @@
-from src.essentials import *
+from essentials import *
 
 NO_TRIALS = 12000
 NO_TESTS = 100

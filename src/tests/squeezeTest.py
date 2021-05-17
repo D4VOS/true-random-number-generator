@@ -1,8 +1,9 @@
-from src.essentials import *
+from essentials import *
 
 NO_SAMPLES = 2400000  # should be at least 2.3 million
 NO_TESTS = 100000  # don't change this
 RATIO = NO_TESTS / 1000000
+PI = 3.14159265359
 
 EXPECTED = [21.03, 57.79, 175.54, 467.32, 1107.83, 2367.84,
             4609.44, 8241.16, 13627.81, 20968.49, 30176.12, 40801.97, 52042.03,
@@ -43,7 +44,7 @@ def G(z):
     tmp = 2 * z
     if tmp != 2 * z or z == 0: print("Error in calling G(z)!!!")
     if tmp == 1:
-        return sqrt(PI)
+        return math.sqrt(PI)
     elif tmp == 2:
         return 1
 
