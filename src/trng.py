@@ -1,33 +1,18 @@
-import os
-import sys
-import time
-
-import cv2  # pip install opencv-python
-import matplotlib.pyplot as plt
-import numpy as np
-import sympy as sp
+from essentials import *
 
 # =============================================================================
 # * Constants
 # =============================================================================
-
 SEED_OUTPUT = "seed_output.txt"
-RESULT_OUTPUT = "output.txt"
-BINARY_OUTPUT = "binaryout.bin"
+RESULT_OUTPUT = "binaryout.bin"
 VIDEO_PATH = "resources/test2.mp4"
 NUMBERS_COUNT = 9600000
-
 m = 257  # 8 bits
 
-
-# m = 4294967295  # 32 bits :Sadge:
-# m = 65537       # 16 bits
 
 # =============================================================================
 # * Random number generate methods
 # =============================================================================
-
-
 def getSeed(video):
     value = getRandomPixelValue(video) + 3  # get random pixel's value
     result = {
@@ -69,29 +54,6 @@ def getRandomNumber(generated_number, video):
 # =============================================================================
 # * Display methods
 # =============================================================================
-
-# function to convert to subscript
-# from https://www.geeksforgeeks.org/how-to-print-superscript-and-subscript-in-python/
-def get_sub(x):
-    normal = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-=()"
-    sub_s = "ₐ₈CDₑբGₕᵢⱼₖₗₘₙₒₚQᵣₛₜᵤᵥwₓᵧZₐ♭꜀ᑯₑբ₉ₕᵢⱼₖₗₘₙₒₚ૧ᵣₛₜᵤᵥwₓᵧ₂₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎"
-    res = x.maketrans(''.join(normal), ''.join(sub_s))
-    return x.translate(res)
-
-
-def xstr(s):  # 'None' as string
-    if s is None:
-        return ''
-    return str(s)
-
-
-def entropy(labels, base=None):
-    value, counts = np.unique(labels, return_counts=True)
-    norm_counts = counts / counts.sum()
-    base = 0 if base is None else base
-    return -(norm_counts * np.log(norm_counts) / np.log(base)).sum()
-
-
 def showHistogram(txt_path):
     file = open(txt_path, "r")
     data = np.loadtxt(file)
@@ -162,9 +124,8 @@ def worker():
     generated_number = getRandomNumber(generated_number, video)  # get first random value
 
     files = {
-        "result": open(RESULT_OUTPUT, "a"),
         "source": open(SEED_OUTPUT, "a"),
-        "binary": open(BINARY_OUTPUT, "a")
+        "binary": open(RESULT_OUTPUT, "a")
     }
     index = 0
     buffer = 0x0
@@ -193,16 +154,15 @@ def worker():
     print("Done.", NUMBERS_COUNT, "numbers have been generated in", end, "seconds.")  # finish time measure
 
 
-# =============================================================================
-# * Main --new - reset current output.txt file, --hist - only generate histogram
-# =============================================================================
+# =======================================================================
+# * Main --new - clear output files, --hist - only generate histogram
+# =======================================================================
 def main():
     if len(sys.argv) > 1:
         if sys.argv[1] == "--new":
             try:
                 os.remove(SEED_OUTPUT)
                 os.remove(RESULT_OUTPUT)
-                os.remove(BINARY_OUTPUT)
                 print("Outputs files have been removed!")
             except Exception as e:
                 print(f"Creating new ones..")
