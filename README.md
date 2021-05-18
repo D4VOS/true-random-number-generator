@@ -39,7 +39,7 @@ The implementation of each of the tests is carried out by the Kolmogorov-Smirnov
 
 ------------
 ### Who knows, he knows
->Jeśli znalazłeś to repozytorium szukając kodu na BST - daj chociaż gwiazdkę :smile:
+>Jeśli znalazłeś to repozytorium szukając kodu na BST, daj chociaż gwiazdkę :smile:
 
 [Diehard]:<https://en.wikipedia.org/wiki/Diehard_tests>
 [DOI]:<https://www.researchgate.net/publication/325740094_Non-Recurring_Improved_Random_Number_Generator-_a_new_step_to_improve_cryptographic_algorithms/fulltext/5b211af50f7e9b0e3740174d/Non-Recurring-Improved-Random-Number-Generator-a-new-step-to-improve-cryptographic-algorithms.pdf>
