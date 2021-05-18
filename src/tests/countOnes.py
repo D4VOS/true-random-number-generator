@@ -34,6 +34,7 @@ def init(numbers: list[int], histogram: bool = False):
                 letters.append('D')
             elif counter >= 6:
                 letters.append('E')
+
         expected_freq = getExpectedProbs()
 
         words4, counts4 = connectLetters(letters, word_length=4)    # get 4-letters words and occurrences for every unique one

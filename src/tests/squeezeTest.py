@@ -14,12 +14,14 @@ EXPECTED = [21.03, 57.79, 175.54, 467.32, 1107.83, 2367.84,
 
 
 def init(numbers: list[int], histogram: bool = False):
-    p_val = []
     print(f"Squeeze Test: ", end="")
-    exp_freq = [RATIO * EXPECTED[i] for i in range(len(EXPECTED))]
-    floats = [numbers[i] / 4294967296 for i in range(len(numbers))]  # -> [0;1)
+
     current_index = 0
     p_vals = []
+
+    exp_freq = [RATIO * EXPECTED[i] for i in range(len(EXPECTED))]
+    floats = [numbers[i] / 4294967296 for i in range(len(numbers))]  # -> [0;1)
+
     for test in range(16):
         freq = [0] * 43  # init empty freq array
         for _ in range(NO_TESTS):
@@ -31,11 +33,14 @@ def init(numbers: list[int], histogram: bool = False):
                 current_index += 1
             j = 6 if j < 6 else j
             freq[j - 6] += 1
+
         chsq = chiCalc(freq, exp_freq)
         p = 1 - Chisq(42, chsq)
         p_vals.append(p)
         # print(f"p-value={round(p, 6)} ", end="")
+
     _, p_value = sc.kstest(p_vals, 'uniform')
+
     print(f"after 16 tests: p-value={round(p_value, 6)} ", end="")
     if 0.025 < p_value < 0.975:
         print("PASSED")
