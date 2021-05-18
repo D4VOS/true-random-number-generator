@@ -18,7 +18,9 @@ Numbers are saved as raw binary so a million 8-bit numbers will take up exactly 
 >The generator output file is called *binaryout.bin*, it is created in the main folder. Diehard tests also use it.
 
 ## Histogram of generated 1M 8bit numbers
-![Histogram](https://raw.githubusercontent.com/D4VOS/true_random_number_generator/97ca73ea80bde7f8fc6bd10ca817d517cb36c1ab/charts/output_m_257.png)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/D4VOS/true_random_number_generator/97ca73ea80bde7f8fc6bd10ca817d517cb36c1ab/charts/output_m_257.png" />
+</p>
 
 ------------
 # Diehard tests
