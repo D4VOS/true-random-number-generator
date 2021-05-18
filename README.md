@@ -13,7 +13,7 @@ Numbers are saved as raw binary so a million 8-bit numbers will take up exactly 
 
 ```python main.py --hist```
 
-###Notes
+### Notes
 
 >The generator output file is called *binaryout.bin*, it is created in the main folder. Diehard tests also use it.
 
@@ -24,9 +24,8 @@ Numbers are saved as raw binary so a million 8-bit numbers will take up exactly 
 # Diehard tests
 > All tests need at least 38 million 32-bit numbers = 152 million 8-bit numbers.
 > [All tests are described here][Diehard]
-> 
-> 
-> The implementation of each of the tests is carried out by the Kolmogorov-Smirnov test with a uniform distribution in the range from 0 to 1 of the obtained p_value of each unit test.
+
+The implementation of each of the tests is carried out by the Kolmogorov-Smirnov test with a uniform distribution in the range from 0 to 1 of the obtained *p_value* of each unit test.
 
 ###Implemented
 - Count-the-1's test
@@ -37,7 +36,7 @@ Numbers are saved as raw binary so a million 8-bit numbers will take up exactly 
 ```python main.py --test```
 
 ------------
-###Who knows, he knows
+### Who knows, he knows
 >Jeślli szukasz kodu na BST to chociaż daj gwiazdkę :smile:
 
 [Diehard]:<https://en.wikipedia.org/wiki/Diehard_tests>
