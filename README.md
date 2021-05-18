@@ -14,6 +14,7 @@ Numbers are saved as raw binary so a million 8-bit numbers will take up exactly 
 ```python main.py --hist```
 
 ###Notes
+
 >The generator output file is called *binaryout.bin*, it is created in the main folder. Diehard tests also use it.
 
 ## Histogram of generated 1M 8bit numbers
@@ -26,6 +27,7 @@ Numbers are saved as raw binary so a million 8-bit numbers will take up exactly 
 > 
 > 
 > The implementation of each of the tests is carried out by the Kolmogorov-Smirnov test with a uniform distribution in the range from 0 to 1 of the obtained p_value of each unit test.
+
 ###Implemented
 - Count-the-1's test
 - Parking Lot test
