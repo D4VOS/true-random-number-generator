@@ -15,6 +15,7 @@ import struct
 from itertools import compress
 
 
+
 # ----------------------------------------------- CONSTANTS -------------------------------------------------#
 RESULT_OUTPUT = "binaryout.bin"
 VIDEO_PATH = "resources/test2.mp4"
@@ -29,10 +30,10 @@ def saveToBinary(buffer, file):
     file.write(struct.pack('B', buffer))
 
 
-def binaryToArray(path, flag32bit: bool=False):
+def binaryToArray(path, flag32bit: bool = False):
     """Loading binary file to array"""
     vals = []
-    print(f"Started loading file.. ", end="")
+    print(f"Started loading file.. ")
     mode = 'I' if flag32bit else 'B'
     div = 4 if flag32bit else 1
     bytes = 4 if flag32bit else 1
@@ -42,6 +43,11 @@ def binaryToArray(path, flag32bit: bool=False):
             vals.append(int(str(struct.unpack(mode, f.read(bytes))).strip('(,)')))  # same format as above
     print(f"Done.")
     return vals
+
+
+def int32_to_int8(n) -> list[int]:
+    mask = (1 << 8) - 1
+    return [(n >> k) & mask for k in range(0, 32, 8)]
 
 
 # ----------------------------------------------- MATH -------------------------------------------------#
@@ -63,6 +69,13 @@ def Phi(z):
     tmp = z / math.sqrt(2.)
     tmp = 1 + math.erf(tmp)
     return tmp / 2
+
+
+def chiCalc(data, count, probs) -> int:
+    chi = 0
+    for k, v in zip(data, count):
+        chi += ((v - probs[k]) ** 2) / probs[k]
+    return chi
 
 
 def entropy(labels, base=None):
@@ -88,6 +101,14 @@ def primes(n):
 def genNumbers(count: int, bits: int, normalized: bool = False) -> list[int]:
     print(f"Loading data.. ", end="")
     numbers = [random.randrange((2 ** bits) - 1) for _ in range(count)]
+    if normalized: numbers = [numbers[j] / 2 ** bits for j in range(len(numbers))]
+    print(f"Done.")
+    return numbers
+
+
+def genFakeNumbers(count: int, bits: int, normalized: bool = False) -> list[int]:
+    print(f"Loading data.. ", end="")
+    numbers = [i % 10000 for i in range(count)]
     if normalized: numbers = [numbers[j] / 2 ** bits for j in range(len(numbers))]
     print(f"Done.")
     return numbers

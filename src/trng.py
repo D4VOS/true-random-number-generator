@@ -3,7 +3,7 @@ from src.generator import *
 
 def generateNumbers(count, append: bool = False):
     """Generating numbers"""
-    print(f"Loading video file ({VIDEO_PATH}).. ", end="")
+    print(f"Loading video file ({VIDEO_PATH}).. ")
     mode = "ab" if append else "wb"
     video = Video(VIDEO_PATH)
     print(f"Done.")

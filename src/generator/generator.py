@@ -26,7 +26,6 @@ class Video:
         del self.frames
         del self.frame_count
         del self.seed_base
-        print("Deleted Video Object")
 
     def getPixelValue(self) -> int:
         """Returns pixel value based on system clock value"""
@@ -55,7 +54,6 @@ class Generator:
         del self.source
         del self.output
         del self.result
-        print("Deleted Generator Object")
 
     def next(self):
         while True:

@@ -7,11 +7,12 @@ def main():
         if option in ["--new", "--hist", "--test", "--append"]:
             break
         os.system('cls')
-        option = input("Missing or invalid parameter. Choose the task:\n"
+        option = input("Missing or invalid parameter.\n"
                        "\t--new <count> to run generator\n"
                        "\t--append to append new n 8-bit numbers to binary file\n"
                        "\t--hist to display histogram from binary file\n"
-                       "\t--test to run diehard tests:\n")
+                       "\t--test to run diehard tests:\n"
+                       "Choose the task: ")
     os.system('cls')
     # ---------------------------------------- RUN TASK -------------------------------------------------#
     if option in ["--append", "--new"]:
