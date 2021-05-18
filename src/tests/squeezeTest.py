@@ -1,6 +1,6 @@
-from essentials import *
+from src.essentials import *
 
-NO_SAMPLES = 2400000  # should be at least 2.3 million
+NO_SAMPLES = 2400000  # should be at least 2.3 million 32 bit numbers
 NO_TESTS = 100000  # don't change this
 RATIO = NO_TESTS / 1000000
 PI = 3.14159265359
@@ -20,7 +20,7 @@ def init(numbers: list[int], histogram: bool = False):
     floats = [numbers[i] / 4294967296 for i in range(len(numbers))]  # -> [0;1)
     current_index = 0
     p_vals = []
-    for test in range(20):
+    for test in range(16):
         freq = [0] * 43  # init empty freq array
         for _ in range(NO_TESTS):
             k = 2147483647
@@ -36,7 +36,7 @@ def init(numbers: list[int], histogram: bool = False):
         p_vals.append(p)
         # print(f"p-value={round(p, 6)} ", end="")
     _, p_value = sc.kstest(p_vals, 'uniform')
-    print(f"after 20 tests: p-value={round(p_value, 6)} ", end="")
+    print(f"after 16 tests: p-value={round(p_value, 6)} ", end="")
     if 0.025 < p_value < 0.975:
         print("PASSED")
     else:
