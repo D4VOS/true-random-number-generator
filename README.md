@@ -23,7 +23,7 @@ Numbers are saved as raw binary so a million 8-bit numbers will take up exactly 
 </p>
 
 ------------
-# Diehard tests
+# Diehard's tests
 > All tests need at least 38 million 32-bit numbers = 152 million 8-bit numbers.
 > [All tests are described here][Diehard]
 
