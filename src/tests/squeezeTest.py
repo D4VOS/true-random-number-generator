@@ -14,7 +14,7 @@ EXPECTED = [21.03, 57.79, 175.54, 467.32, 1107.83, 2367.84,
 
 
 def init(numbers: list[int], histogram: bool = False):
-    print(f"Squeeze Test: ", end="")
+    print(f"\n\nSqueeze Test: ", end="")
 
     current_index = 0
     p_vals = []
@@ -41,7 +41,7 @@ def init(numbers: list[int], histogram: bool = False):
 
     _, p_value = sc.kstest(p_vals, 'uniform')
 
-    print(f"after 16 tests: p-value={round(p_value, 6)} ", end="")
+    print(f"Result of 16 tests: p-value={round(p_value, 6)} ", end="")
     if 0.025 < p_value < 0.975:
         print("PASSED")
     else:
@@ -91,7 +91,7 @@ def showHistogram(freq: list[int]) -> None:
 
 def showBars(freq: list[int]) -> None:
     x_axis = np.linspace(0, len(freq) - 1, num=len(freq))
-    plt.hist(freq, bins=len(freq)//2, weights=np.zeros_like(freq) + 1. / len(freq))
+    plt.hist(freq, bins=len(freq) // 2, weights=np.zeros_like(freq) + 1. / len(freq))
     plt.title("Empiryczny rozkład wartości p")
     plt.xlabel("Wartość")
     plt.ylabel("Częstotliwość występowania")

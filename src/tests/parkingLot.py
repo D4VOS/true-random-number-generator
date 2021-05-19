@@ -11,7 +11,7 @@ def init(numbers: list[int], histogram: bool = False):
     curent_index = 0
     p = []
     successes = []
-    print(f"Parking Lot test: ", end="")
+    print(f"\n\nParking Lot test: ")
     for test in range(0, NO_TESTS):  # 100 testow
         x = [0.] * NO_TRIALS
         y = [0.] * NO_TRIALS
@@ -44,11 +44,11 @@ def init(numbers: list[int], histogram: bool = False):
         p_val = 1 - Phi(z_score)
         p.append(p_val)
 
-        # print(f"No.{test + 1}\t\tNo.parked = {no_success} p_value= {round(p_val, 6)}")
+        print(f"{test + 1}. No.parked = {no_success} p_value= {round(p_val, 6)}")
         successes.append(z_score)
 
     _, pvalue = sc.kstest(p, 'uniform')
-    print(f"after 100 tests: p-value={round(pvalue, 6)} ", end="")
+    print(f"Result of 100 tests: p-value={round(pvalue, 6)} ", end="")
     if 0.025 < pvalue < 0.975:
         print("PASSED")
     else:
@@ -58,7 +58,7 @@ def init(numbers: list[int], histogram: bool = False):
         showHistogram(p, "Empiryczny rozkład wartości p")
 
 
-def showHistogram(freq: list[int], title: str) -> None:
+def showHistogram(freq: list[float], title: str) -> None:
     plt.hist(freq, bins=20, stacked=True, weights=np.zeros_like(freq) + 1. / len(freq))
     plt.title(title)
     plt.xlabel("Wartość")

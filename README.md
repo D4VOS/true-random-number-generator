@@ -4,7 +4,7 @@
 
 The quality of the generated numbers depends mainly on the video file. Ideally, it should be as dynamic as possible. The generator generates a million numbers in a maximum of 10 seconds (depending on your CPU, of course)
 
-Numbers are saved as raw binary so a million 8-bit numbers will take up exactly 1MB
+Numbers are saved as raw binary so a million 8-bit numbers will take up exactly 1,000,000 bytes
 ##### Executing:
 
 ```python main.py --new [range of numbers]```

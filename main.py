@@ -39,7 +39,7 @@ def main():
             print("Any file provided! Generate new one using --new")
     elif option == "--test":
         try:
-            runTests()
+            runTests(False)
         except FileNotFoundError:
             print("Any file provided! Generate new one using --new")
 
