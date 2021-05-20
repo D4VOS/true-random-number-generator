@@ -14,7 +14,7 @@ EXPECTED = [21.03, 57.79, 175.54, 467.32, 1107.83, 2367.84,
 
 
 def init(numbers: list[int], histogram: bool = False):
-    print(f"\n\nSqueeze Test: ", end="")
+    print(f"\n\nSqueeze Test:")
 
     current_index = 0
     p_vals = []
@@ -37,7 +37,7 @@ def init(numbers: list[int], histogram: bool = False):
         chsq = chiCalc(freq, exp_freq)
         p = 1 - Chisq(42, chsq)
         p_vals.append(p)
-        # print(f"p-value={round(p, 6)} ", end="")
+        print(f"p-value={round(p, 6)}")
 
     _, p_value = sc.kstest(p_vals, 'uniform')
 

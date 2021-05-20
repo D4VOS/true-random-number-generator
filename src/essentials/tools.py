@@ -14,11 +14,9 @@ import gc
 import struct
 from itertools import compress
 
-
-
 # ----------------------------------------------- CONSTANTS -------------------------------------------------#
 RESULT_OUTPUT = "binaryout.bin"
-VIDEO_PATH = "resources/test2.mp4"
+VIDEO_PATH = "resources/seed.mp4"
 GOLDEN_RATIO = 1.61803398875
 PI = 3.14159265359
 M = 257
@@ -74,6 +72,7 @@ def Phi(z):
 def chiCalc(data, count, probs) -> int:
     chi = 0
     for k, v in zip(data, count):
+        print(v,"->",probs[k])
         chi += ((v - probs[k]) ** 2) / probs[k]
     return chi
 
@@ -93,7 +92,8 @@ def primes(n):
         if sieve[i]:
             k = 3 * i + 1 | 1
             sieve[k * k // 3::2 * k] = [False] * ((n // 6 - k * k // 6 - 1) // k + 1)
-            sieve[k * (k - 2 * (i & 1) + 4) // 3::2 * k] = [False] * ((n // 6 - k * (k - 2 * (i & 1) + 4) // 6 - 1) // k + 1)
+            sieve[k * (k - 2 * (i & 1) + 4) // 3::2 * k] = [False] * (
+                        (n // 6 - k * (k - 2 * (i & 1) + 4) // 6 - 1) // k + 1)
     return [2, 3] + [3 * i + 1 | 1 for i in range(1, n // 3 - correction) if sieve[i]]
 
 
@@ -140,7 +140,8 @@ def showHistogramFromGenerator(data):
     ax.set_xlabel("Wartość (x{})".format(get_sub('i')))
     ax.set_ylabel("Częstotliwość występowania (p{})".format(get_sub('i')))
     ax.set_title("Empiryczny rozkład zmiennych losowych {}\n".format('po post-processingu'))
-    ax.text(0.12, 0.08, "H(X)={0}\nM={1}".format(round(ent, 5), M), transform=ax.transAxes, fontsize=10, verticalalignment='bottom', bbox=props)
+    ax.text(0.12, 0.08, "H(X)={0}\nM={1}".format(round(ent, 5), M), transform=ax.transAxes, fontsize=10,
+            verticalalignment='bottom', bbox=props)
     ax.ticklabel_format(useOffset=False, style='sci')
     plt.gca().set_ylim(0, histogram[0].max() * 1.05)
     plt.gca().set_xlim(0, (M - 1) - 1)

@@ -4,13 +4,14 @@ from src import *
 def main():
     option = sys.argv[1] if len(sys.argv) > 1 else None
     while True:
-        if option in ["--new", "--hist", "--test", "--append"]:
+        if option in ["--new", "--hist", "--test", "--append","--verify"]:
             break
         os.system('cls')
         option = input("Missing or invalid parameter.\n"
                        "\t--new <count> to run generator\n"
                        "\t--append to append new n 8-bit numbers to binary file\n"
                        "\t--hist to display histogram from binary file\n"
+                       "\t--verify to verify tests using random library that passees the diehard tests\n"
                        "\t--test to run diehard tests:\n"
                        "Choose the task: ")
     os.system('cls')
@@ -37,9 +38,10 @@ def main():
             showHistogramFromGenerator(data)
         except FileNotFoundError:
             print("Any file provided! Generate new one using --new")
-    elif option == "--test":
+    elif option in ["--test", "--verify"]:
         try:
-            runTests(False)
+            check = True if option == "--verify" else False
+            runTests(check)
         except FileNotFoundError:
             print("Any file provided! Generate new one using --new")
 
