@@ -59,19 +59,23 @@ def init(numbers: list[int], histogram: bool = False):
     else:
         print("FAILED")
     if histogram:
-        showHistogram(counts4, "Empiryczny rozkład wystąpień wyrazów 4-literowych", 4)
-        showHistogram(counts5, "Empiryczny rozkład wystąpień wyrazów 5-literowych", 5)
+        showHistogram(counts4, expected_freq, "Empiryczny rozkład wystąpień wyrazów 4-literowych", 4)
+        showHistogram(counts5, expected_freq, "Empiryczny rozkład wystąpień wyrazów 5-literowych", 5)
         showBars(p_vals)
         makeCDF(p_vals)
-        plt.show()
+
 
 
 def makeCDF(x, plot=True, *args, **kwargs):
     x, y = sorted(x), np.arange(len(x)) / len(x)
+    ideal_x = [0.5] * len(x)
+    ideal_y = np.arange(len(ideal_x)) / len(ideal_x)
     plt.title("Empiryczny CDF p")
     plt.xlabel("Wartość p")
     plt.ylabel("Częstotliwość występowania")
-    return plt.plot(x, y, *args, **kwargs) if plot else (x, y)
+    plt.plot(x, y, *args, **kwargs) if plot else (x, y)
+    plt.plot(ideal_x, ideal_y, 'orange') if plot else (ideal_x, ideal_y)
+    plt.show()
 
 
 def getExpectedProbs(word_length) -> dict[str, int]:
@@ -116,10 +120,21 @@ def sortDict(dictionary):
     return res
 
 
-def showHistogram(data, title: str, word_length: int) -> None:
+def showHistogram(data, expected, title: str, word_length: int) -> None:
     total = sum(data)
     x_axis = np.linspace(0, len(data) - 1, num=len(data))
     y_axis = [data[i] / total for i in range(len(data))]
+    if word_length == 4:
+        start = 0
+        end = 625
+    else:
+        start = 625
+        end = 3750
+    expected_y = []
+    for k, v in expected.items():
+        expected_y.append(v / total)
+
+    plt.plot(x_axis, expected_y[start:end], 'orange', alpha=0.4)
     plt.plot(x_axis, y_axis)
     plt.title(title)
     plt.xlabel("Wartość")

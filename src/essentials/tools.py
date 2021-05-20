@@ -72,7 +72,7 @@ def Phi(z):
 def chiCalc(data, count, probs) -> int:
     chi = 0
     for k, v in zip(data, count):
-        print(v,"->",probs[k])
+        #print(v,"->",probs[k])
         chi += ((v - probs[k]) ** 2) / probs[k]
     return chi
 
