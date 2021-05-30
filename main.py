@@ -11,7 +11,7 @@ def main():
                        "\t--new <count> to run generator\n"
                        "\t--append to append new n 8-bit numbers to binary file\n"
                        "\t--hist to display histogram from binary file\n"
-                       "\t--verify to verify tests using random library that passees the diehard tests\n"
+                       "\t--verify to verify tests using random library that passes the diehard tests\n"
                        "\t--test to run diehard tests:\n"
                        "Choose the task: ")
     os.system('cls')
