@@ -78,7 +78,7 @@ def chiCalc(data, count, probs) -> int:
 
 
 def entropy(labels, base=None):
-    value, counts = np.unique(labels, return_counts=True)
+    _, counts = np.unique(labels, return_counts=True)
     norm_counts = counts / counts.sum()
     base = 0 if base is None else base
     return -(norm_counts * np.log(norm_counts) / np.log(base)).sum()
