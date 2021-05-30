@@ -33,10 +33,10 @@ class Video:
         current_time = time.time() * 1000  # get system_clock
 
         posX = int((current_time + self.seed_base) % self.width)
-        self.seed_base += self.GOLDEN_RATIO
+        self.seed_base = (self.seed_base + self.GOLDEN_RATIO) % 4294967295
 
         posY = int((current_time + self.seed_base) % self.height)
-        self.seed_base += self.GOLDEN_RATIO
+        self.seed_base = (self.seed_base + self.GOLDEN_RATIO) % 4294967295
 
 
         no_frame = (posX * posY) % self.frame_count
