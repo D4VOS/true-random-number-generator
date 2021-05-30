@@ -37,7 +37,7 @@ def init(numbers: list[int], histogram: bool = False):
         chsq = chiCalc(freq, exp_freq)
         p = 1 - Chisq(42, chsq)
         p_vals.append(p)
-        print(f"p-value={round(p, 6)}")
+        print(f"{test + 1}. p-value={round(p, 6)}")
 
     _, p_value = sc.kstest(p_vals, 'uniform')
 

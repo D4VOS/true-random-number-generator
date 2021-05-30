@@ -49,7 +49,7 @@ def init(numbers: list[int], histogram: bool = False):
         chsq = chi5 - chi4
         z = (chsq - MEAN) / STD
         p = 1 - Phi(z)
-        print(f"{test + 1}. chisquare={round(chsq, 2)}\tz-score={round(z, 3)}\tp-value={round(p, 6)}")
+        print(f"{test + 1}. Q4={chi4} Q5={chi5} chisquare={round(chsq, 2)}\tz-score={round(z, 3)}\tp-value={round(p, 6)}")
 
         p_vals.append(p)
     _, p_value = sc.kstest(p_vals, 'uniform')
