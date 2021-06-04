@@ -19,7 +19,7 @@ Numbers are saved as raw binary so a million 8-bit numbers will take up exactly 
 
 ## Histogram of generated 50M 8bit numbers
 <p align="center">
-  <img src="https://raw.githubusercontent.com/D4VOS/true_random_number_generator/97ca73ea80bde7f8fc6bd10ca817d517cb36c1ab/charts/output_m_257.png" />
+  <img src="https://raw.githubusercontent.com/D4VOS/true_random_number_generator/723238d872111cff51b066d43af6339b7cac2044/charts/output_m_257.png" />
 </p>
 
 ------------
