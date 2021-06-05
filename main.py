@@ -1,10 +1,13 @@
-from src import *
+from src import generateNumbers, binaryToArray, showHistogramFromGenerator, runTests
+from src import sys, os
+from src import RESULT_OUTPUT
+
 
 
 def main():
-    option = sys.argv[1] if len(sys.argv) > 1 else None
+    option = sys.argv[1].lower() if len(sys.argv) > 1 else None
     while True:
-        if option in ["--new", "--hist", "--test", "--append","--verify"]:
+        if option in ["--new", "--hist", "--test", "--append", "--verify"]:
             break
         os.system('cls')
         option = input("Missing or invalid parameter.\n"
@@ -13,7 +16,7 @@ def main():
                        "\t--hist to display histogram from binary file\n"
                        "\t--verify to verify tests using random library that passes the diehard tests\n"
                        "\t--test to run diehard tests:\n"
-                       "Choose the task: ")
+                       "Choose the task: ").lower()
     os.system('cls')
     # ---------------------------------------- RUN TASK -------------------------------------------------#
     if option in ["--append", "--new"]:
